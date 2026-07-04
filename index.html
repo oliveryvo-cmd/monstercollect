@@ -2,340 +2,507 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>MonsterCollect</title>
+<title>MonsterCollect v2</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { background:#000; overflow:hidden; font-family:'Arial Black',sans-serif; }
-#c { width:100vw; height:100vh; display:block; }
-#topbar {
-  position:fixed; top:16px; left:50%; transform:translateX(-50%);
-  background:linear-gradient(135deg,rgba(0,0,0,0.85),rgba(20,0,60,0.85));
-  border:2px solid #a855f7; border-radius:20px; padding:8px 24px;
-  color:#fff; font-size:18px; letter-spacing:2px; box-shadow:0 0 20px #a855f7;
-  pointer-events:none; z-index:10;
-}
-#catchbtn {
-  position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
-  background:linear-gradient(135deg,#7c3aed,#db2777);
-  border:3px solid #f0abfc; border-radius:50px; padding:14px 40px;
-  color:#fff; font-size:20px; font-weight:900; cursor:pointer;
-  box-shadow:0 0 30px #a855f7; letter-spacing:3px; display:none;
-  pointer-events:all; z-index:10;
-}
-#nearbyname {
-  position:fixed; bottom:100px; left:50%; transform:translateX(-50%);
-  color:#fde68a; font-size:22px; font-weight:900; text-shadow:0 0 12px #f59e0b;
-  display:none; letter-spacing:2px; text-align:center; z-index:10; pointer-events:none;
-}
-#caught-msg {
-  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-  font-size:48px; font-weight:900; color:#fde68a;
-  text-shadow:0 0 30px #f59e0b, 0 0 60px #f59e0b;
-  display:none; text-align:center; pointer-events:none; z-index:20;
-}
-#collection-btn {
-  position:fixed; top:16px; right:16px;
-  background:linear-gradient(135deg,#1d4ed8,#7c3aed);
-  border:2px solid #93c5fd; border-radius:14px; padding:10px 18px;
-  color:#fff; font-size:16px; font-weight:900; cursor:pointer;
-  box-shadow:0 0 16px #3b82f6; z-index:10; letter-spacing:1px;
-}
-#counter {
-  position:fixed; top:16px; left:16px;
-  background:rgba(0,0,0,0.75); border:2px solid #a855f7;
-  border-radius:14px; padding:10px 18px; color:#fff; font-size:16px;
-  font-weight:900; box-shadow:0 0 12px #a855f7; z-index:10; pointer-events:none;
-}
-#collection-screen {
-  position:fixed; top:0; left:0; right:0; bottom:0;
-  background:rgba(0,0,0,0.95); z-index:100; display:none;
-  flex-direction:column; align-items:center; padding:20px; overflow-y:auto;
-}
-#collection-screen h1 { color:#fde68a; font-size:40px; margin-bottom:20px; text-shadow:0 0 20px #f59e0b; letter-spacing:4px; }
-#collection-grid { display:grid; grid-template-columns:repeat(auto-fill,180px); gap:16px; width:100%; max-width:900px; }
-.monster-card { background:linear-gradient(135deg,#1e1b4b,#312e81); border:2px solid #7c3aed; border-radius:16px; padding:16px; text-align:center; color:#fff; }
-.monster-card.locked { opacity:0.3; filter:grayscale(1); }
-.mname { font-size:14px; font-weight:900; margin-top:8px; color:#fde68a; letter-spacing:1px; }
-.mtype { font-size:11px; color:#a78bfa; margin-top:2px; }
-.mdesc { font-size:10px; color:#6ee7b7; margin-top:2px; }
-#close-collection { margin-top:20px; background:#7c3aed; border:none; border-radius:12px; padding:12px 32px; color:#fff; font-size:18px; font-weight:900; cursor:pointer; letter-spacing:2px; }
-#controls-hint { position:fixed; bottom:30px; right:16px; background:rgba(0,0,0,0.7); border:1px solid #4b5563; border-radius:10px; padding:10px 14px; color:#9ca3af; font-size:12px; line-height:1.8; z-index:10; pointer-events:none; }
-#title-screen {
-  position:fixed; top:0; left:0; right:0; bottom:0;
-  background:radial-gradient(ellipse at center, #1e1b4b 0%, #000 100%);
-  z-index:200; display:flex; flex-direction:column; align-items:center; justify-content:center;
-}
-#title-screen h1 { font-size:68px; color:#fde68a; text-shadow:0 0 40px #f59e0b; letter-spacing:6px; margin-bottom:8px; animation:pulse 2s infinite; text-align:center; }
-#title-screen p { color:#a78bfa; font-size:20px; margin-bottom:50px; letter-spacing:3px; }
-#start-btn { background:linear-gradient(135deg,#7c3aed,#db2777); border:3px solid #f0abfc; border-radius:50px; padding:18px 60px; color:#fff; font-size:26px; font-weight:900; cursor:pointer; box-shadow:0 0 40px #a855f7; letter-spacing:4px; animation:glow 2s infinite alternate; }
-@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
-@keyframes glow { from{box-shadow:0 0 20px #a855f7} to{box-shadow:0 0 60px #f0abfc} }
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:#000;overflow:hidden;font-family:'Arial Black',Arial,sans-serif;}
+#c{width:100vw;height:100vh;display:block;}
+
+/* HUD */
+#topbar{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:rgba(0,0,60,0.88);border:2px solid #a855f7;border-radius:20px;padding:7px 22px;color:#fff;font-size:17px;letter-spacing:2px;box-shadow:0 0 18px #a855f7;pointer-events:none;z-index:10;}
+#counter{position:fixed;top:12px;left:14px;background:rgba(0,0,0,0.8);border:2px solid #a855f7;border-radius:13px;padding:9px 16px;color:#fff;font-size:14px;font-weight:900;z-index:10;pointer-events:none;}
+#story-btn{position:fixed;top:12px;right:130px;background:linear-gradient(135deg,#065f46,#047857);border:2px solid #6ee7b7;border-radius:13px;padding:9px 16px;color:#fff;font-size:14px;font-weight:900;cursor:pointer;z-index:10;}
+#collection-btn{position:fixed;top:12px;right:14px;background:linear-gradient(135deg,#1d4ed8,#7c3aed);border:2px solid #93c5fd;border-radius:13px;padding:9px 16px;color:#fff;font-size:14px;font-weight:900;cursor:pointer;z-index:10;}
+#team-btn{position:fixed;bottom:14px;right:14px;background:linear-gradient(135deg,#b45309,#d97706);border:2px solid #fde68a;border-radius:13px;padding:9px 16px;color:#fff;font-size:14px;font-weight:900;cursor:pointer;z-index:10;}
+#nearbyname{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);color:#fde68a;font-size:20px;font-weight:900;text-shadow:0 0 10px #f59e0b;display:none;z-index:10;pointer-events:none;text-align:center;}
+#catchbtn{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7c3aed,#db2777);border:3px solid #f0abfc;border-radius:50px;padding:13px 36px;color:#fff;font-size:19px;font-weight:900;cursor:pointer;box-shadow:0 0 25px #a855f7;letter-spacing:2px;display:none;z-index:10;}
+#caught-msg{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:44px;font-weight:900;color:#fde68a;text-shadow:0 0 30px #f59e0b;display:none;text-align:center;pointer-events:none;z-index:30;}
+#controls-hint{position:fixed;bottom:14px;left:14px;background:rgba(0,0,0,0.65);border:1px solid #374151;border-radius:9px;padding:9px 13px;color:#9ca3af;font-size:11px;line-height:1.9;z-index:10;pointer-events:none;}
+
+/* TITLE */
+#title-screen{position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at center,#1e1b4b 0%,#000 100%);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+#title-screen h1{font-size:64px;color:#fde68a;text-shadow:0 0 40px #f59e0b;letter-spacing:6px;margin-bottom:6px;animation:pulse 2s infinite;text-align:center;line-height:1.1;}
+#title-screen .sub{color:#a78bfa;font-size:16px;margin-bottom:10px;letter-spacing:2px;}
+#title-screen .ver{color:#6ee7b7;font-size:13px;margin-bottom:44px;letter-spacing:1px;}
+#start-btn{background:linear-gradient(135deg,#7c3aed,#db2777);border:3px solid #f0abfc;border-radius:50px;padding:16px 54px;color:#fff;font-size:24px;font-weight:900;cursor:pointer;letter-spacing:3px;animation:glow 2s infinite alternate;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes glow{from{box-shadow:0 0 20px #a855f7}to{box-shadow:0 0 60px #f0abfc}}
+
+/* BATTLE SCREEN */
+#battle-screen{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(180deg,#0a0a2e 0%,#1a0a3e 40%,#2a1a0e 100%);z-index:150;display:none;flex-direction:column;}
+#battle-header{padding:12px 20px;text-align:center;color:#fde68a;font-size:15px;letter-spacing:2px;border-bottom:1px solid #4b5563;}
+#battle-arena{display:flex;flex:1;align-items:center;justify-content:space-around;padding:10px 20px;gap:10px;}
+.battle-side{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;}
+.battle-name{color:#fde68a;font-size:16px;font-weight:900;letter-spacing:1px;}
+.battle-type{color:#a78bfa;font-size:11px;}
+.hp-bar-wrap{width:100%;max-width:200px;background:#1f2937;border-radius:8px;height:14px;border:1px solid #374151;overflow:hidden;}
+.hp-bar-fill{height:100%;background:linear-gradient(90deg,#22c55e,#4ade80);border-radius:8px;transition:width 0.4s;}
+.hp-bar-fill.mid{background:linear-gradient(90deg,#f59e0b,#fbbf24);}
+.hp-bar-fill.low{background:linear-gradient(90deg,#ef4444,#f87171);}
+.hp-text{color:#9ca3af;font-size:12px;}
+.battle-sprite{font-size:80px;filter:drop-shadow(0 0 20px currentColor);animation:monsterBob 1.5s ease-in-out infinite;}
+.battle-sprite.enemy{animation:monsterBob 1.5s ease-in-out infinite 0.3s;}
+.battle-sprite.shake{animation:monsterShake 0.4s;}
+@keyframes monsterBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes monsterShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+#battle-vs{font-size:36px;font-weight:900;color:#7c3aed;text-shadow:0 0 20px #a855f7;}
+#battle-log{background:rgba(0,0,0,0.6);border:1px solid #374151;border-radius:10px;margin:0 14px;padding:10px 14px;color:#e5e7eb;font-size:13px;min-height:52px;line-height:1.6;}
+#battle-actions{padding:12px 14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.move-btn{background:linear-gradient(135deg,#1e1b4b,#312e81);border:2px solid #7c3aed;border-radius:12px;padding:10px 6px;color:#fff;font-size:12px;font-weight:900;cursor:pointer;letter-spacing:0.5px;transition:transform 0.1s;}
+.move-btn:hover{transform:scale(1.04);}
+.move-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+#btn-switch{background:linear-gradient(135deg,#713f12,#92400e);border:2px solid #fde68a;border-radius:12px;padding:10px;color:#fff;font-size:12px;font-weight:900;cursor:pointer;}
+#btn-run{background:linear-gradient(135deg,#7f1d1d,#991b1b);border:2px solid #fca5a5;border-radius:12px;padding:10px;color:#fff;font-size:12px;font-weight:900;cursor:pointer;}
+#switch-panel{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.9);z-index:200;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;}
+#switch-panel h2{color:#fde68a;font-size:24px;margin-bottom:10px;}
+.switch-card{background:linear-gradient(135deg,#1e1b4b,#312e81);border:2px solid #7c3aed;border-radius:14px;padding:14px 24px;color:#fff;cursor:pointer;font-size:18px;font-weight:900;min-width:200px;text-align:center;}
+.switch-card:hover{border-color:#f0abfc;}
+.switch-card.fainted{opacity:0.35;cursor:not-allowed;}
+#switch-cancel{background:#374151;border:none;border-radius:12px;padding:10px 28px;color:#fff;font-size:16px;font-weight:900;cursor:pointer;margin-top:6px;}
+
+/* COLLECTION */
+#collection-screen{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.96);z-index:100;display:none;flex-direction:column;align-items:center;padding:16px;overflow-y:auto;}
+#collection-screen h1{color:#fde68a;font-size:36px;margin-bottom:16px;text-shadow:0 0 18px #f59e0b;letter-spacing:3px;}
+#collection-tabs{display:flex;gap:10px;margin-bottom:16px;}
+.ctab{background:#1e1b4b;border:2px solid #7c3aed;border-radius:10px;padding:8px 18px;color:#a78bfa;font-size:13px;font-weight:900;cursor:pointer;}
+.ctab.active{background:#7c3aed;color:#fff;}
+#collection-grid{display:grid;grid-template-columns:repeat(auto-fill,160px);gap:14px;width:100%;max-width:860px;}
+.monster-card{background:linear-gradient(135deg,#1e1b4b,#312e81);border:2px solid #7c3aed;border-radius:14px;padding:14px;text-align:center;color:#fff;}
+.monster-card.locked{opacity:0.28;filter:grayscale(1);}
+.monster-card.evolved-card{border-color:#f59e0b;background:linear-gradient(135deg,#3b2200,#78350f);}
+.micon{font-size:52px;height:70px;display:flex;align-items:center;justify-content:center;}
+.mname{font-size:13px;font-weight:900;margin-top:6px;color:#fde68a;letter-spacing:1px;}
+.mtype{font-size:10px;color:#a78bfa;margin-top:2px;}
+.mstats{font-size:10px;color:#6ee7b7;margin-top:3px;}
+#close-collection{margin-top:16px;background:#7c3aed;border:none;border-radius:11px;padding:11px 28px;color:#fff;font-size:16px;font-weight:900;cursor:pointer;letter-spacing:2px;}
+
+/* TEAM */
+#team-screen{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.96);z-index:100;display:none;flex-direction:column;align-items:center;padding:20px;overflow-y:auto;}
+#team-screen h1{color:#fde68a;font-size:32px;margin-bottom:8px;letter-spacing:3px;}
+#team-screen p{color:#9ca3af;font-size:13px;margin-bottom:18px;}
+#team-slots{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:20px;}
+.team-slot{background:linear-gradient(135deg,#1e1b4b,#312e81);border:2px solid #7c3aed;border-radius:14px;padding:14px;text-align:center;color:#fff;min-width:130px;}
+.team-slot.empty{opacity:0.4;border-style:dashed;}
+.team-slot .remove-btn{margin-top:8px;background:#7f1d1d;border:none;border-radius:8px;padding:5px 12px;color:#fff;font-size:11px;cursor:pointer;}
+#bench-title{color:#fde68a;font-size:18px;font-weight:900;margin-bottom:10px;align-self:flex-start;padding-left:20px;}
+#bench-grid{display:grid;grid-template-columns:repeat(auto-fill,130px);gap:10px;width:100%;max-width:700px;}
+.bench-card{background:rgba(30,27,75,0.8);border:2px solid #374151;border-radius:12px;padding:10px;text-align:center;color:#fff;cursor:pointer;}
+.bench-card:hover{border-color:#7c3aed;}
+.bench-card.in-team{border-color:#f59e0b;opacity:0.5;cursor:not-allowed;}
+#close-team{margin-top:16px;background:#7c3aed;border:none;border-radius:11px;padding:11px 28px;color:#fff;font-size:16px;font-weight:900;cursor:pointer;}
+
+/* STORY */
+#story-screen{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.96);z-index:100;display:none;flex-direction:column;align-items:center;padding:24px;overflow-y:auto;}
+#story-screen h1{color:#fde68a;font-size:32px;margin-bottom:6px;letter-spacing:3px;}
+#story-screen .lore{color:#9ca3af;font-size:14px;margin-bottom:24px;max-width:500px;text-align:center;line-height:1.7;}
+#trainer-list{width:100%;max-width:500px;display:flex;flex-direction:column;gap:10px;}
+.trainer-row{background:rgba(30,27,75,0.8);border:2px solid #374151;border-radius:13px;padding:14px 18px;display:flex;align-items:center;gap:14px;}
+.trainer-row.beaten{border-color:#22c55e;}
+.trainer-row.beaten .trainer-status{color:#22c55e;}
+.trainer-icon{font-size:32px;}
+.trainer-info{flex:1;}
+.trainer-info .tname{color:#fde68a;font-size:15px;font-weight:900;}
+.trainer-info .tdesc{color:#9ca3af;font-size:12px;margin-top:3px;}
+.trainer-status{font-size:18px;}
+#close-story{margin-top:20px;background:#7c3aed;border:none;border-radius:11px;padding:11px 28px;color:#fff;font-size:16px;font-weight:900;cursor:pointer;}
+
+/* MISC */
+#evo-msg{position:fixed;top:30%;left:50%;transform:translate(-50%,-50%);font-size:36px;font-weight:900;color:#f59e0b;text-shadow:0 0 30px #f59e0b;display:none;text-align:center;pointer-events:none;z-index:40;background:rgba(0,0,0,0.7);padding:20px 30px;border-radius:16px;border:2px solid #f59e0b;}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
+
+<!-- TITLE -->
 <div id="title-screen">
   <h1>MONSTER<br>COLLECT</h1>
-  <p>Explore. Find. Catch them all.</p>
+  <div class="sub">Explore. Catch. Battle. Evolve.</div>
+  <div class="ver">⚔️ Version 2.0 — Story Mode</div>
   <button id="start-btn" onclick="startGame()">▶ START GAME</button>
 </div>
+
+<!-- HUD -->
 <div id="topbar">⚡ MONSTERCOLLECT</div>
-<div id="counter">📦 0 / 8 Caught</div>
-<button id="collection-btn" onclick="openCollection()">📋 COLLECTION</button>
+<div id="counter">📦 0/16 &nbsp;|&nbsp; 🏆 0/5</div>
+<button id="story-btn" onclick="openStory()">📖 QUEST</button>
+<button id="collection-btn" onclick="openCollection()">📋 DEX</button>
+<button id="team-btn" onclick="openTeam()">⚔️ TEAM</button>
 <div id="nearbyname"></div>
 <button id="catchbtn" onclick="throwOrb()">🔮 CATCH!</button>
 <div id="caught-msg"></div>
-<div id="controls-hint">WASD — Move<br>Mouse — Look<br>C / Tap — Catch<br>TAB — Collection</div>
+<div id="evo-msg"></div>
+<div id="controls-hint">WASD — Move<br>Mouse — Look<br>C — Catch &nbsp; B — Battle<br>TAB — Collection</div>
+
+<!-- BATTLE -->
+<div id="battle-screen">
+  <div id="battle-header">⚔️ BATTLE!</div>
+  <div id="battle-arena">
+    <div class="battle-side" id="player-battle-side">
+      <div class="battle-name" id="player-battle-name">FLAMOR</div>
+      <div class="battle-type" id="player-battle-type">Fire Lion</div>
+      <div class="hp-bar-wrap"><div class="hp-bar-fill" id="player-hp-fill" style="width:100%"></div></div>
+      <div class="hp-text" id="player-hp-text">80 / 80</div>
+      <div class="battle-sprite" id="player-sprite">🔥</div>
+    </div>
+    <div id="battle-vs">VS</div>
+    <div class="battle-side" id="enemy-battle-side">
+      <div class="battle-sprite enemy" id="enemy-sprite">⚡</div>
+      <div class="hp-text" id="enemy-hp-text">80 / 80</div>
+      <div class="hp-bar-wrap"><div class="hp-bar-fill" id="enemy-hp-fill" style="width:100%"></div></div>
+      <div class="battle-type" id="enemy-battle-type">Electric Bear</div>
+      <div class="battle-name" id="enemy-battle-name">THUNDERPAW</div>
+    </div>
+  </div>
+  <div id="battle-log">The battle begins!</div>
+  <div id="battle-actions">
+    <button class="move-btn" id="move0" onclick="useMove(0)">Move 1</button>
+    <button class="move-btn" id="move1" onclick="useMove(1)">Move 2</button>
+    <button class="move-btn" id="move2" onclick="useMove(2)">Move 3</button>
+    <button id="btn-switch" onclick="openSwitch()">🔄 Switch</button>
+    <div></div>
+    <button id="btn-run" onclick="runFromBattle()">🏃 Run</button>
+  </div>
+</div>
+
+<!-- SWITCH PANEL -->
+<div id="switch-panel">
+  <h2>Choose a Monster</h2>
+  <div id="switch-options"></div>
+  <button id="switch-cancel" onclick="closeSwitch()">✖ Cancel</button>
+</div>
+
+<!-- COLLECTION -->
 <div id="collection-screen">
-  <h1>🏆 MY COLLECTION</h1>
+  <h1>📖 MONSTER DEX</h1>
+  <div id="collection-tabs">
+    <button class="ctab active" onclick="showTab('all')">All</button>
+    <button class="ctab" onclick="showTab('caught')">Caught</button>
+    <button class="ctab" onclick="showTab('evolved')">Evolved</button>
+  </div>
   <div id="collection-grid"></div>
   <button id="close-collection" onclick="closeCollection()">✖ CLOSE</button>
 </div>
+
+<!-- TEAM -->
+<div id="team-screen">
+  <h1>⚔️ MY TEAM</h1>
+  <p>Pick up to 3 monsters for battle. Drag from bench to team!</p>
+  <div id="team-slots"></div>
+  <div id="bench-title">🪑 BENCH (caught monsters)</div>
+  <div id="bench-grid"></div>
+  <button id="close-team" onclick="closeTeam()">✖ CLOSE</button>
+</div>
+
+<!-- STORY -->
+<div id="story-screen">
+  <h1>📖 QUEST LOG</h1>
+  <p class="lore">The VOID EMPEROR has unleashed dark trainers across the land. Defeat all 4 trainers, then face the VOID EMPEROR to save the monster world!</p>
+  <div id="trainer-list"></div>
+  <button id="close-story" onclick="closeStory()">✖ CLOSE</button>
+</div>
+
 <script src="https://cdn.babylonjs.com/babylon.js"></script>
 <script>
-var MONSTERS=[
-  {id:'flamor',name:'FLAMOR',type:'Fire Lion',emoji:'🔥',color:'#ff4500',ec:'#ff2200',desc:'Blazing mane, volcanic roar'},
-  {id:'glaceon',name:'GLACEON',type:'Ice Wolf',emoji:'❄️',color:'#00cfff',ec:'#0088ff',desc:'Crystal claws, frozen howl'},
-  {id:'vortexor',name:'VORTEXOR',type:'Wind Serpent',emoji:'🌀',color:'#00ff88',ec:'#00cc66',desc:'Spiral body, hurricane breath'},
-  {id:'thunderpaw',name:'THUNDERPAW',type:'Electric Bear',emoji:'⚡',color:'#ffdd00',ec:'#ffaa00',desc:'Static fur, lightning strike'},
-  {id:'shadowcrawl',name:'SHADOWCRAWL',type:'Shadow Spider',emoji:'🕷️',color:'#9900ff',ec:'#6600cc',desc:'Eight dark legs, void web'},
-  {id:'aquafin',name:'AQUAFIN',type:'Water Dragon',emoji:'💧',color:'#00aaff',ec:'#0055ff',desc:'Scales of sea, tidal wave'},
-  {id:'stoneback',name:'STONEBACK',type:'Rock Titan',emoji:'🪨',color:'#c87941',ec:'#884422',desc:'Granite armor, earth quake'},
-  {id:'neonfly',name:'NEONFLY',type:'Neon Moth',emoji:'🦋',color:'#ff00ff',ec:'#cc00ff',desc:'Plasma wings, light speed'}
+// ============================================================
+// MONSTER DEFINITIONS
+// ============================================================
+var CATCHABLE=[
+  {id:'flamor',name:'FLAMOR',type:'Fire Lion',emoji:'🔥',color:'#ff4500',ec:'#ff2200',desc:'Blazing mane, volcanic roar',hp:80,evolvesTo:'infernus',moves:[{n:'Fire Bite',d:18,e:'🔥'},{n:'Flame Rush',d:28,e:'💨'},{n:'Volcano Burst',d:42,e:'🌋'}]},
+  {id:'glaceon',name:'GLACEON',type:'Ice Wolf',emoji:'❄️',color:'#00cfff',ec:'#0088ff',desc:'Crystal claws, frozen howl',hp:75,evolvesTo:'blizzara',moves:[{n:'Ice Slash',d:16,e:'❄️'},{n:'Frost Bite',d:26,e:'🐺'},{n:'Blizzard',d:44,e:'🌨️'}]},
+  {id:'vortexor',name:'VORTEXOR',type:'Wind Serpent',emoji:'🌀',color:'#00ff88',ec:'#00cc66',desc:'Spiral body, hurricane breath',hp:70,evolvesTo:'tempestus',moves:[{n:'Wind Slice',d:17,e:'🌀'},{n:'Cyclone',d:27,e:'💨'},{n:'Hurricane',d:46,e:'🌪️'}]},
+  {id:'thunderpaw',name:'THUNDERPAW',type:'Electric Bear',emoji:'⚡',color:'#ffdd00',ec:'#ffaa00',desc:'Static fur, lightning strike',hp:85,evolvesTo:'voltking',moves:[{n:'Thunder Slap',d:20,e:'⚡'},{n:'Static Shock',d:30,e:'🌩️'},{n:'Thunderstorm',d:45,e:'⛈️'}]},
+  {id:'shadowcrawl',name:'SHADOWCRAWL',type:'Shadow Spider',emoji:'🕷️',color:'#9900ff',ec:'#6600cc',desc:'Eight dark legs, void web',hp:72,evolvesTo:'voidlord',moves:[{n:'Venom Fang',d:22,e:'🕷️'},{n:'Dark Web',d:32,e:'🌑'},{n:'Shadow Burst',d:48,e:'💀'}]},
+  {id:'aquafin',name:'AQUAFIN',type:'Water Dragon',emoji:'💧',color:'#00aaff',ec:'#0055ff',desc:'Scales of sea, tidal wave',hp:78,evolvesTo:'tsunamix',moves:[{n:'Bubble Shot',d:16,e:'💧'},{n:'Water Slash',d:28,e:'🌊'},{n:'Tidal Smash',d:44,e:'🌊'}]},
+  {id:'stoneback',name:'STONEBACK',type:'Rock Titan',emoji:'🪨',color:'#c87941',ec:'#884422',desc:'Granite armor, earth quake',hp:90,evolvesTo:'boulderking',moves:[{n:'Rock Throw',d:18,e:'🪨'},{n:'Stone Crush',d:30,e:'💥'},{n:'Earthquake',d:50,e:'🌍'}]},
+  {id:'neonfly',name:'NEONFLY',type:'Neon Moth',emoji:'🦋',color:'#ff00ff',ec:'#cc00ff',desc:'Plasma wings, light speed',hp:68,evolvesTo:'cosmowing',moves:[{n:'Neon Beam',d:20,e:'🦋'},{n:'Plasma Ray',d:32,e:'💜'},{n:'Cosmic Blast',d:50,e:'✨'}]}
 ];
+
+var EVOLUTIONS=[
+  {id:'infernus',name:'INFERNUS',type:'Fire Titan',emoji:'🌋',color:'#ff2200',ec:'#ff0000',desc:'Ancient fire god reborn',hp:140,evolvedFrom:'flamor',moves:[{n:'Magma Slam',d:32,e:'🌋'},{n:'Solar Flare',d:48,e:'☀️'},{n:'Titan Rage',d:65,e:'👹'}]},
+  {id:'blizzara',name:'BLIZZARA',type:'Ice Dragon',emoji:'🐉',color:'#88eeff',ec:'#00ccff',desc:'Frozen dragon of the north',hp:130,evolvedFrom:'glaceon',moves:[{n:'Ice Fang',d:30,e:'🐉'},{n:'Frozen Strike',d:46,e:'❄️'},{n:'Absolute Zero',d:62,e:'🌨️'}]},
+  {id:'tempestus',name:'TEMPESTUS',type:'Wind God',emoji:'⚡',color:'#00ffaa',ec:'#00cc88',desc:'Living hurricane incarnate',hp:125,evolvedFrom:'vortexor',moves:[{n:'Storm Slash',d:28,e:'🌪️'},{n:'Wind Blade',d:44,e:'💨'},{n:'Tempest Fury',d:60,e:'⛈️'}]},
+  {id:'voltking',name:'VOLTKING',type:'Electric King',emoji:'👑',color:'#ffee00',ec:'#ffcc00',desc:'Electric emperor of beasts',hp:145,evolvedFrom:'thunderpaw',moves:[{n:'King Shock',d:35,e:'👑'},{n:'Lightning Crown',d:50,e:'⚡'},{n:'Thunder God',d:68,e:'🌩️'}]},
+  {id:'voidlord',name:'VOIDLORD',type:'Shadow God',emoji:'👾',color:'#cc00ff',ec:'#aa00dd',desc:'Lord of the endless dark',hp:135,evolvedFrom:'shadowcrawl',moves:[{n:'Void Crush',d:33,e:'👾'},{n:'Dark Nova',d:50,e:'🌑'},{n:'Oblivion',d:70,e:'💀'}]},
+  {id:'tsunamix',name:'TSUNAMIX',type:'Water Titan',emoji:'🌊',color:'#0066ff',ec:'#0044cc',desc:'Ocean titan, wave master',hp:138,evolvedFrom:'aquafin',moves:[{n:'Tsunami Rush',d:30,e:'🌊'},{n:'Depth Charge',d:48,e:'💧'},{n:'Ocean Fury',d:64,e:'🌀'}]},
+  {id:'boulderking',name:'BOULDERKING',type:'Rock God',emoji:'🗿',color:'#d4a76a',ec:'#a07040',desc:'Mountain king, unbreakable',hp:155,evolvedFrom:'stoneback',moves:[{n:'Boulder Smash',d:36,e:'🗿'},{n:'Meteor Drop',d:52,e:'☄️'},{n:'Continental Crush',d:72,e:'🌍'}]},
+  {id:'cosmowing',name:'COSMOWING',type:'Cosmic Angel',emoji:'🌟',color:'#ff88ff',ec:'#ff00ff',desc:'Cosmic being, pure energy',hp:128,evolvedFrom:'neonfly',moves:[{n:'Star Beam',d:28,e:'⭐'},{n:'Cosmic Ray',d:46,e:'🌟'},{n:'Galaxy Strike',d:66,e:'🌌'}]}
+];
+
+var ALL_MONSTERS=CATCHABLE.concat(EVOLUTIONS);
+
+// ============================================================
+// TRAINER DEFINITIONS
+// ============================================================
+var TRAINERS=[
+  {id:'t1',name:'TRAINER BLAZE',desc:'Pyro master of the east forest',emoji:'🧑‍🦰',color:'#ff4500',
+   pos:[18,0,5],beaten:false,
+   team:[{def:CATCHABLE[0],hp:80,maxHp:80},{def:CATCHABLE[3],hp:85,maxHp:85}]},
+  {id:'t2',name:'TRAINER FROSTIA',desc:'Ice queen of the northern peaks',emoji:'👩‍🦳',color:'#00cfff',
+   pos:[-20,0,8],beaten:false,
+   team:[{def:CATCHABLE[1],hp:75,maxHp:75},{def:CATCHABLE[2],hp:70,maxHp:70}]},
+  {id:'t3',name:'TRAINER SHADE',desc:'Shadow master lurking in darkness',emoji:'🧟',color:'#9900ff',
+   pos:[5,0,-20],beaten:false,
+   team:[{def:CATCHABLE[4],hp:72,maxHp:72},{def:CATCHABLE[5],hp:78,maxHp:78},{def:CATCHABLE[6],hp:90,maxHp:90}]},
+  {id:'t4',name:'TRAINER NOVA',desc:'Cosmic trainer from the void',emoji:'🧑‍🚀',color:'#ff00ff',
+   pos:[-8,0,22],beaten:false,
+   team:[{def:CATCHABLE[7],hp:68,maxHp:68},{def:EVOLUTIONS[0],hp:140,maxHp:140}]},
+  {id:'boss',name:'VOID EMPEROR',desc:'Master of darkness. Final challenge!',emoji:'👿',color:'#cc00ff',
+   pos:[0,0,0],beaten:false,locked:true,
+   team:[{def:EVOLUTIONS[4],hp:135,maxHp:135},{def:EVOLUTIONS[6],hp:155,maxHp:155},{def:EVOLUTIONS[7],hp:128,maxHp:128}]}
+];
+
+// ============================================================
+// GAME STATE
+// ============================================================
 var engine,scene,camera,player;
 var monsterEntities=[];
-var caught={};
-var nearbyMonster=null;
-var catchAnimating=false;
+var trainerEntities=[];
+var caught={};       // id -> true
+var playerTeam=[];   // [{def, hp, maxHp, wins}]
 var keys={};
 var time=0;
 var gameStarted=false;
+var nearbyMonster=null;
+var nearbyTrainer=null;
+var catchAnimating=false;
+var inBattle=false;
+var battleData=null; // {enemy:{def,hp,maxHp}, isTrainer, trainerRef, playerMonIdx}
+var collectionTab='all';
+var trainersBeaten=0;
 
+// ============================================================
+// HELPERS
+// ============================================================
 function h2c(h){var r=parseInt(h.slice(1,3),16)/255,g=parseInt(h.slice(3,5),16)/255,b=parseInt(h.slice(5,7),16)/255;return new BABYLON.Color3(r,g,b);}
-function mat(col,ec,al){var m=new BABYLON.StandardMaterial('m'+Math.random(),scene);m.diffuseColor=h2c(col);m.emissiveColor=h2c(ec);if(al!=null)m.alpha=al;return m;}
+function mat(col,ec,al){var m=new BABYLON.StandardMaterial('m'+Math.random().toString(36).slice(2),scene);m.diffuseColor=h2c(col);m.emissiveColor=h2c(ec);if(al!=null)m.alpha=al;return m;}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v));}
 
+// ============================================================
+// TITLE
+// ============================================================
 function startGame(){document.getElementById('title-screen').style.display='none';gameStarted=true;initBabylon();}
 
+// ============================================================
+// BABYLON
+// ============================================================
 function initBabylon(){
   var canvas=document.getElementById('c');
   engine=new BABYLON.Engine(canvas,true);
   scene=new BABYLON.Scene(engine);
   scene.clearColor=new BABYLON.Color4(0.01,0.01,0.06,1);
-  scene.gravity=new BABYLON.Vector3(0,-9.8,0);
-  scene.collisionsEnabled=true;
-
   camera=new BABYLON.UniversalCamera('cam',new BABYLON.Vector3(0,4,-8),scene);
-  camera.setTarget(new BABYLON.Vector3(0,1,0));
-  camera.minZ=0.1;
-
+  camera.setTarget(new BABYLON.Vector3(0,1,0));camera.minZ=0.1;
   var amb=new BABYLON.HemisphericLight('amb',new BABYLON.Vector3(0,1,0),scene);
-  amb.intensity=0.55;amb.diffuse=new BABYLON.Color3(0.6,0.5,1);amb.specular=new BABYLON.Color3(0,0,0);
+  amb.intensity=0.5;amb.diffuse=new BABYLON.Color3(0.6,0.5,1);amb.specular=new BABYLON.Color3(0,0,0);
   var sun=new BABYLON.PointLight('sun',new BABYLON.Vector3(10,30,10),scene);
-  sun.intensity=0.9;sun.diffuse=new BABYLON.Color3(1,0.9,0.8);
-
-  buildWorld();buildPlayer();spawnMonsters();setupInput(canvas);
-
-  engine.runRenderLoop(function(){
-    var dt=engine.getDeltaTime()/1000;
-    if(gameStarted)update(dt);
-    scene.render();
-  });
+  sun.intensity=0.85;sun.diffuse=new BABYLON.Color3(1,0.9,0.8);
+  buildWorld();buildPlayer();spawnMonsters();spawnTrainers();setupInput(canvas);
+  engine.runRenderLoop(function(){var dt=engine.getDeltaTime()/1000;if(gameStarted&&!inBattle)update(dt);scene.render();});
   window.addEventListener('resize',function(){engine.resize();});
 }
 
+// ============================================================
+// WORLD
+// ============================================================
 function buildWorld(){
-  var ground=BABYLON.MeshBuilder.CreateGround('g',{width:100,height:100,subdivisions:4},scene);
-  var gm=mat('#1a5c1a','#081808');ground.material=gm;
-
-  // Sky sphere
-  var sky=BABYLON.MeshBuilder.CreateSphere('sky',{diameter:200,segments:6,sideOrientation:BABYLON.Mesh.BACKSIDE},scene);
+  var g=BABYLON.MeshBuilder.CreateGround('g',{width:120,height:120,subdivisions:4},scene);
+  g.material=mat('#1a5c1a','#081808');
+  var sky=BABYLON.MeshBuilder.CreateSphere('sky',{diameter:220,segments:5,sideOrientation:BABYLON.Mesh.BACKSIDE},scene);
   var sm=new BABYLON.StandardMaterial('sm',scene);sm.emissiveColor=new BABYLON.Color3(0.02,0.01,0.1);sm.backFaceCulling=false;sky.material=sm;
-
-  // Stars
-  for(var i=0;i<800;i++){
-    var s=BABYLON.MeshBuilder.CreateSphere('s'+i,{diameter:0.07+Math.random()*0.1},scene);
-    var stm=new BABYLON.StandardMaterial('stm'+i,scene);
-    stm.emissiveColor=new BABYLON.Color3(0.7+Math.random()*0.3,0.7+Math.random()*0.3,0.7+Math.random()*0.3);
-    s.material=stm;
-    var a=Math.random()*Math.PI*2,b=Math.random()*Math.PI*0.6+0.1,r=88+Math.random()*5;
-    s.position.set(Math.sin(b)*Math.cos(a)*r,Math.cos(b)*r*0.7+10,Math.sin(b)*Math.sin(a)*r);
+  // Stars (reduced count for performance)
+  for(var i=0;i<400;i++){
+    var s=BABYLON.MeshBuilder.CreateSphere('s'+i,{diameter:0.08+Math.random()*0.12},scene);
+    var stm=new BABYLON.StandardMaterial('stm'+i,scene);stm.emissiveColor=new BABYLON.Color3(0.7+Math.random()*0.3,0.7+Math.random()*0.3,0.8+Math.random()*0.2);
+    s.material=stm;var a=Math.random()*Math.PI*2,b=Math.random()*Math.PI*0.55+0.1,r=90+Math.random()*5;
+    s.position.set(Math.sin(b)*Math.cos(a)*r,Math.cos(b)*r*0.7+12,Math.sin(b)*Math.sin(a)*r);
   }
-
-  // Floating islands with platforms
-  var iColors=['#2d5a1b','#1a3d5c','#4a1a5a','#5a3a1a'];
-  for(var i=0;i<10;i++){
-    var angle=i/10*Math.PI*2, dist=18+Math.random()*10;
+  // Islands
+  var iC=['#2d5a1b','#1a3d5c','#4a1a5a','#5a3a1a'];
+  for(var i=0;i<10;i++){var ang=i/10*Math.PI*2,dist=20+Math.random()*8;
     var isl=BABYLON.MeshBuilder.CreateCylinder('isl'+i,{height:1.5,diameterTop:4+Math.random()*3,diameterBottom:1.5,tessellation:6},scene);
-    isl.material=mat(iColors[i%4],iColors[i%4]);
-    isl.position.set(Math.cos(angle)*dist,4+Math.random()*4,Math.sin(angle)*dist);
-    var top=BABYLON.MeshBuilder.CreateBox('it'+i,{width:4+Math.random()*3,height:0.2,depth:4+Math.random()*3},scene);
-    top.material=mat('#22661a','#0a3308');
-    top.position=isl.position.clone();top.position.y+=0.85;
-  }
-
+    isl.material=mat(iC[i%4],iC[i%4]);isl.position.set(Math.cos(ang)*dist,4+Math.random()*4,Math.sin(ang)*dist);}
   // Trees
-  for(var i=0;i<40;i++){
-    var tx=(Math.random()-0.5)*90,tz=(Math.random()-0.5)*90;
+  for(var i=0;i<35;i++){var tx=(Math.random()-0.5)*100,tz=(Math.random()-0.5)*100;
+    if(Math.abs(tx)<5&&Math.abs(tz)<5)continue;
     var trk=BABYLON.MeshBuilder.CreateCylinder('trk'+i,{height:2+Math.random(),diameterTop:0.3,diameterBottom:0.5},scene);
-    trk.material=mat('#5a3a0f','#3a2508');trk.position.set(tx,0.8+Math.random()*0.5,tz);
+    trk.material=mat('#5a3a0f','#3a2508');trk.position.set(tx,1,tz);
     var lv=BABYLON.MeshBuilder.CreateSphere('lv'+i,{diameter:2.5+Math.random()*1.5,segments:5},scene);
-    lv.material=mat('#1a6612','#0a3808');lv.position.set(tx,3+Math.random(),tz);
-  }
-
-  // Mystical orbs
-  for(var i=0;i<25;i++){
-    var orb=BABYLON.MeshBuilder.CreateSphere('orb'+i,{diameter:0.3},scene);
-    var orbColors=['#ff00ff','#00ffff','#ffff00','#ff8800','#88ff00'];
-    var om=new BABYLON.StandardMaterial('om'+i,scene);om.emissiveColor=h2c(orbColors[i%5]);
-    orb.material=om;orb.position.set((Math.random()-0.5)*80,0.5+Math.random()*2,(Math.random()-0.5)*80);
-  }
-
-  // Giant portal ring
+    lv.material=mat('#1a6612','#0a3808');lv.position.set(tx,3.2+Math.random(),tz);}
+  // Portal (where boss spawns)
   var ring=BABYLON.MeshBuilder.CreateTorus('ring',{diameter:5,thickness:0.3,tessellation:40},scene);
-  var rm=new BABYLON.StandardMaterial('rm',scene);rm.emissiveColor=new BABYLON.Color3(0.9,0.1,1);
-  ring.material=rm;ring.position.y=4;ring.rotation.x=Math.PI/2;
-
-  // Crystal pillars
-  for(var i=0;i<6;i++){
-    var angle=i/6*Math.PI*2;
+  var rm=new BABYLON.StandardMaterial('rm',scene);rm.emissiveColor=new BABYLON.Color3(0.8,0.1,1);ring.material=rm;ring.position.y=4;ring.rotation.x=Math.PI/2;
+  // Crystal pillars around portal
+  for(var i=0;i<6;i++){var ang=i/6*Math.PI*2;
     var pil=BABYLON.MeshBuilder.CreateCylinder('pil'+i,{height:6,diameterTop:0.2,diameterBottom:0.5,tessellation:6},scene);
-    pil.material=mat('#220044','#8800ff');
-    pil.position.set(Math.cos(angle)*8,3,Math.sin(angle)*8);
-  }
+    pil.material=mat('#220044','#8800ff');pil.position.set(Math.cos(ang)*8,3,Math.sin(ang)*8);}
+  // Glowing orbs
+  for(var i=0;i<20;i++){var orb=BABYLON.MeshBuilder.CreateSphere('dorb'+i,{diameter:0.28},scene);
+    var oC=['#ff00ff','#00ffff','#ffff00','#ff8800','#88ff00'];
+    var om=new BABYLON.StandardMaterial('dom'+i,scene);om.emissiveColor=h2c(oC[i%5]);orb.material=om;
+    orb.position.set((Math.random()-0.5)*80,0.5+Math.random()*2,(Math.random()-0.5)*80);}
 }
 
+// ============================================================
+// PLAYER
+// ============================================================
 function buildPlayer(){
-  player=new BABYLON.TransformNode('player',scene);
-  player.position.set(0,0,0);
-  var body=BABYLON.MeshBuilder.CreateSphere('pbody',{diameter:0.65,segments:6},scene);
-  body.material=mat('#1a4aff','#0022cc');body.parent=player;body.position.y=0.33;
-  var head=BABYLON.MeshBuilder.CreateSphere('phead',{diameter:0.52,segments:6},scene);
-  head.material=mat('#f0c090','#c08060');head.parent=player;head.position.y=0.95;
-  var cap=BABYLON.MeshBuilder.CreateCylinder('pcap',{height:0.15,diameterTop:0.7,diameterBottom:0.4,tessellation:8},scene);
-  cap.material=mat('#cc2222','#aa0000');cap.parent=player;cap.position.y=1.25;
-  var brim=BABYLON.MeshBuilder.CreateCylinder('pbrim',{height:0.06,diameter:0.9,tessellation:8},scene);
-  brim.material=mat('#cc2222','#aa0000');brim.parent=player;brim.position.y=1.17;
-  var cape=BABYLON.MeshBuilder.CreateBox('pcape',{width:0.6,height:0.7,depth:0.06},scene);
-  cape.material=mat('#8822aa','#550088');cape.parent=player;cape.position.set(0,0.35,-0.3);
+  player=new BABYLON.TransformNode('player',scene);player.position.set(0,0,-8);
+  var body=BABYLON.MeshBuilder.CreateSphere('pb',{diameter:0.65,segments:6},scene);body.material=mat('#1a4aff','#0022cc');body.parent=player;body.position.y=0.33;
+  var head=BABYLON.MeshBuilder.CreateSphere('ph',{diameter:0.52,segments:6},scene);head.material=mat('#f0c090','#c08060');head.parent=player;head.position.y=0.95;
+  var cap=BABYLON.MeshBuilder.CreateCylinder('pc',{height:0.15,diameterTop:0.7,diameterBottom:0.4,tessellation:8},scene);cap.material=mat('#cc2222','#aa0000');cap.parent=player;cap.position.y=1.25;
+  var brim=BABYLON.MeshBuilder.CreateCylinder('pbr',{height:0.06,diameter:0.9,tessellation:8},scene);brim.material=mat('#cc2222','#aa0000');brim.parent=player;brim.position.y=1.17;
+  var cape=BABYLON.MeshBuilder.CreateBox('pcape',{width:0.6,height:0.7,depth:0.06},scene);cape.material=mat('#8822aa','#550088');cape.parent=player;cape.position.set(0,0.35,-0.3);
 }
 
-function buildFlamor(pos){
-  var r=new BABYLON.TransformNode('flamor',scene);r.position=pos.clone();
-  var body=BABYLON.MeshBuilder.CreateSphere('fb',{diameter:1.3,segments:8},scene);body.material=mat('#cc2200','#ff4400');body.parent=r;body.position.y=0.65;
-  var head=BABYLON.MeshBuilder.CreateSphere('fh',{diameter:0.9,segments:8},scene);head.material=mat('#dd3300','#ff5500');head.parent=r;head.position.y=1.65;
-  for(var i=0;i<8;i++){var sp=BABYLON.MeshBuilder.CreateCylinder('fsp'+i,{height:0.55,diameterTop:0,diameterBottom:0.2},scene);sp.material=mat('#ff8800','#ffcc00');sp.parent=r;var a=i/8*Math.PI*2;sp.position.set(Math.cos(a)*0.52,1.7,Math.sin(a)*0.52);sp.rotation.z=Math.cos(a)*0.7;sp.rotation.x=Math.sin(a)*0.7;}
-  [[-0.38,-0.3],[0.38,-0.3],[-0.38,0.3],[0.38,0.3]].forEach(function(xz,i){var l=BABYLON.MeshBuilder.CreateCylinder('fl'+i,{height:0.6,diameter:0.24},scene);l.material=mat('#bb2200','#dd3300');l.parent=r;l.position.set(xz[0],0.12,xz[1]);});
-  var tail=BABYLON.MeshBuilder.CreateCylinder('ft',{height:0.9,diameterTop:0.08,diameterBottom:0.3},scene);tail.material=mat('#cc2200','#ff3300');tail.parent=r;tail.position.set(-0.8,0.6,0);tail.rotation.z=Math.PI/3;
-  var flame=BABYLON.MeshBuilder.CreateSphere('ftf',{diameter:0.4},scene);flame.material=mat('#ff6600','#ffaa00');flame.parent=r;flame.position.set(-1.25,1.0,0);
-  [-0.22,0.22].forEach(function(x,i){var e=BABYLON.MeshBuilder.CreateSphere('fe'+i,{diameter:0.2},scene);e.material=mat('#ffff00','#ffffff');e.parent=r;e.position.set(x,1.7,0.42);});
+// ============================================================
+// MONSTER BUILDERS (compact versions)
+// ============================================================
+function buildMonster(def,pos){
+  var r=new BABYLON.TransformNode(def.id,scene);r.position=pos.clone();
+  var c=def.color,ec=def.ec;
+  // Main body
+  var body=BABYLON.MeshBuilder.CreateSphere('b_'+def.id,{diameter:1.2,segments:7},scene);body.material=mat(c,ec);body.parent=r;body.position.y=0.6;
+  // Head
+  var head=BABYLON.MeshBuilder.CreateSphere('h_'+def.id,{diameter:0.8,segments:7},scene);head.material=mat(c,ec);head.parent=r;head.position.y=1.5;
+  // Unique feature per type
+  if(def.type.includes('Fire')||def.type.includes('Titan')&&def.color.includes('ff')){
+    for(var i=0;i<7;i++){var sp=BABYLON.MeshBuilder.CreateCylinder('sp'+i+def.id,{height:0.5,diameterTop:0,diameterBottom:0.18},scene);sp.material=mat('#ff8800','#ffcc00');sp.parent=r;var a=i/7*Math.PI*2;sp.position.set(Math.cos(a)*0.45,1.55,Math.sin(a)*0.45);sp.rotation.z=Math.cos(a)*0.7;sp.rotation.x=Math.sin(a)*0.7;}
+  } else if(def.type.includes('Ice')){
+    for(var i=0;i<4;i++){var sp=BABYLON.MeshBuilder.CreateCylinder('sp'+i+def.id,{height:0.5+i*0.08,diameterTop:0,diameterBottom:0.13},scene);sp.material=mat('#ddf8ff','#88ddff');sp.parent=r;sp.position.set(0,1.2+i*0.08,-0.4+i*0.22);}
+  } else if(def.type.includes('Wind')||def.type.includes('Serpent')){
+    for(var i=0;i<5;i++){var ring2=BABYLON.MeshBuilder.CreateTorus('vr'+i+def.id,{diameter:1.1-i*0.06,thickness:0.17,tessellation:14},scene);ring2.material=mat(c,ec);ring2.parent=r;ring2.position.y=i*0.3;ring2.rotation.y=i*0.55;}
+    head.position.y=2.2;
+  } else if(def.type.includes('Electric')||def.type.includes('King')){
+    var bolt=BABYLON.MeshBuilder.CreateBox('bolt'+def.id,{width:0.1,height:0.65,depth:0.05},scene);bolt.material=mat('#ffffff','#ffff00');bolt.parent=r;bolt.position.set(0,0.65,0.65);bolt.rotation.z=0.4;
+    [-0.3,0.3].forEach(function(x,i){var ear=BABYLON.MeshBuilder.CreateSphere('ear'+i+def.id,{diameter:0.28},scene);ear.material=mat(c,ec);ear.parent=r;ear.position.set(x,2.2,0);});
+  } else if(def.type.includes('Shadow')){
+    for(var i=0;i<8;i++){var side=i<4?-1:1,idx=i%4;var leg=BABYLON.MeshBuilder.CreateCylinder('leg'+i+def.id,{height:0.9,diameter:0.08},scene);leg.material=mat(c,ec);leg.parent=r;leg.position.set(side*0.45,0.6+idx*0.08,0);leg.rotation.z=side*(Math.PI/3+idx*0.16);}
+  } else if(def.type.includes('Water')){
+    var dors=BABYLON.MeshBuilder.CreateBox('dors'+def.id,{width:0.07,height:0.45,depth:0.6},scene);dors.material=mat(c,ec);dors.parent=r;dors.position.set(0,1.1,0);
+    [-0.45,0.45].forEach(function(x,i){var sf=BABYLON.MeshBuilder.CreateBox('sf'+i+def.id,{width:0.48,height:0.06,depth:0.32},scene);sf.material=mat(c,ec);sf.parent=r;sf.position.set(x,0.65,0.3);sf.rotation.z=x*0.5;});
+  } else if(def.type.includes('Rock')){
+    for(var i=0;i<4;i++){var rsp=BABYLON.MeshBuilder.CreateCylinder('rsp'+i+def.id,{height:0.38,diameterTop:0,diameterBottom:0.14},scene);rsp.material=mat('#999999','#aaaaaa');rsp.parent=r;rsp.position.set(0,1.2,-0.2+i*0.14);}
+  } else if(def.type.includes('Moth')||def.type.includes('Cosmic')||def.type.includes('Neon')){
+    [[-1.0,1.3,0.4],[-0.75,0.8,0.5],[1.0,1.3,-0.4],[0.75,0.8,-0.5]].forEach(function(d,i){var wing=BABYLON.MeshBuilder.CreateBox('wing'+i+def.id,{width:0.9,height:0.05,depth:0.6},scene);var wm=new BABYLON.StandardMaterial('wm'+i+def.id,scene);wm.diffuseColor=h2c(i<2?'#ff00ff':'#00ffff');wm.emissiveColor=h2c(i<2?'#cc00ff':'#00ccff');wm.alpha=0.65;wing.material=wm;wing.parent=r;wing.position.set(d[0],d[1],0);wing.rotation.z=d[2];});
+  }
+  // Evolved monsters are bigger
+  if(def.evolvedFrom){r.scaling=new BABYLON.Vector3(1.4,1.4,1.4);}
+  // Eyes
+  [-0.18,0.18].forEach(function(x,i){var e=BABYLON.MeshBuilder.CreateSphere('eye'+i+def.id+Math.random(),{diameter:0.15},scene);e.material=mat('#ffffff',def.type.includes('Shadow')?'#ff0000':'#ffffff');e.parent=r;e.position.set(x,1.52,0.38);});
+  // Legs
+  [[-0.35,-0.28],[0.35,-0.28],[-0.35,0.28],[0.35,0.28]].forEach(function(xz,i){if(def.type.includes('Serpent'))return;var l=BABYLON.MeshBuilder.CreateCylinder('leg2_'+i+def.id,{height:0.5,diameter:0.2},scene);l.material=mat(c,ec);l.parent=r;l.position.set(xz[0],0.1,xz[1]);});
   return r;
 }
 
-function buildGlaceon(pos){
-  var r=new BABYLON.TransformNode('glaceon',scene);r.position=pos.clone();
-  var body=BABYLON.MeshBuilder.CreateBox('gb',{width:1.1,height:0.85,depth:1.6},scene);body.material=mat('#88ccff','#0088ff');body.parent=r;body.position.y=0.6;
-  var head=BABYLON.MeshBuilder.CreateSphere('gh',{diameter:0.92,segments:8},scene);head.material=mat('#aaddff','#00aaff');head.parent=r;head.position.y=1.5;
-  [-0.28,0.28].forEach(function(x,i){var ear=BABYLON.MeshBuilder.CreateCylinder('ge'+i,{height:0.6,diameterTop:0,diameterBottom:0.24},scene);ear.material=mat('#88ddff','#00ccff');ear.parent=r;ear.position.set(x,2.1,0);ear.rotation.z=x*2;});
-  for(var i=0;i<5;i++){var sp=BABYLON.MeshBuilder.CreateCylinder('gsp'+i,{height:0.55+i*0.1,diameterTop:0,diameterBottom:0.15},scene);sp.material=mat('#ddf8ff','#88ddff');sp.parent=r;sp.position.set(0,1.15+i*0.1,-0.55+i*0.28);}
-  [[-0.4,-0.5],[0.4,-0.5],[-0.4,0.5],[0.4,0.5]].forEach(function(xz,i){var l=BABYLON.MeshBuilder.CreateCylinder('gl'+i,{height:0.55,diameter:0.22},scene);l.material=mat('#66aacc','#0077bb');l.parent=r;l.position.set(xz[0],0.1,xz[1]);});
-  [-0.22,0.22].forEach(function(x,i){var e=BABYLON.MeshBuilder.CreateSphere('gey'+i,{diameter:0.17},scene);e.material=mat('#00ffff','#ffffff');e.parent=r;e.position.set(x,1.56,0.44);});
-  return r;
-}
-
-function buildVortexor(pos){
-  var r=new BABYLON.TransformNode('vortexor',scene);r.position=pos.clone();
-  for(var i=0;i<7;i++){var ring=BABYLON.MeshBuilder.CreateTorus('vr'+i,{diameter:1.3-i*0.08,thickness:0.2,tessellation:16},scene);ring.material=mat('#00bb55','#00ff88');ring.parent=r;ring.position.y=i*0.35;ring.rotation.y=i*0.6;}
-  var head=BABYLON.MeshBuilder.CreateSphere('vh',{diameter:0.8,segments:8},scene);head.material=mat('#00cc66','#00ffaa');head.parent=r;head.position.y=2.7;
-  [-0.22,0.22].forEach(function(x,i){var h=BABYLON.MeshBuilder.CreateCylinder('vh'+i,{height:0.55,diameterTop:0,diameterBottom:0.12},scene);h.material=mat('#00ff88','#aaffcc');h.parent=r;h.position.set(x,3.2,0);h.rotation.z=x*3;});
-  [-0.18,0.18].forEach(function(x,i){var e=BABYLON.MeshBuilder.CreateSphere('ve'+i,{diameter:0.16},scene);e.material=mat('#ffffff','#aaffcc');e.parent=r;e.position.set(x,2.75,0.38);});
-  return r;
-}
-
-function buildThunderpaw(pos){
-  var r=new BABYLON.TransformNode('thunderpaw',scene);r.position=pos.clone();
-  var body=BABYLON.MeshBuilder.CreateSphere('tb',{diameter:1.5,segments:10},scene);body.material=mat('#ddaa00','#ffdd00');body.parent=r;body.position.y=0.75;
-  var head=BABYLON.MeshBuilder.CreateSphere('th',{diameter:1.05,segments:10},scene);head.material=mat('#eebb00','#ffee00');head.parent=r;head.position.y=1.95;
-  [-0.36,0.36].forEach(function(x,i){var ear=BABYLON.MeshBuilder.CreateSphere('te'+i,{diameter:0.33},scene);ear.material=mat('#ffcc00','#ffee88');ear.parent=r;ear.position.set(x,2.6,0);});
-  for(var i=0;i<5;i++){var sp=BABYLON.MeshBuilder.CreateCylinder('tsp'+i,{height:0.38,diameterTop:0,diameterBottom:0.1},scene);sp.material=mat('#ffffff','#ffff88');sp.parent=r;sp.position.set(-0.4+i*0.2,2.6,0);sp.rotation.z=(0.4-i*0.2)*1.5;}
-  var bolt=BABYLON.MeshBuilder.CreateBox('tbolt',{width:0.12,height:0.75,depth:0.06},scene);bolt.material=mat('#ffffff','#ffff00');bolt.parent=r;bolt.position.set(0,0.75,0.76);bolt.rotation.z=0.4;
-  [[-0.52,-0.32],[0.52,-0.32],[-0.52,0.32],[0.52,0.32]].forEach(function(xz,i){var l=BABYLON.MeshBuilder.CreateCylinder('tl'+i,{height:0.65,diameter:0.3},scene);l.material=mat('#cc9900','#eecc00');l.parent=r;l.position.set(xz[0],0.15,xz[1]);});
-  [-0.25,0.25].forEach(function(x,i){var e=BABYLON.MeshBuilder.CreateSphere('tey'+i,{diameter:0.22},scene);e.material=mat('#ff0000','#ff8800');e.parent=r;e.position.set(x,2.0,0.5);});
-  return r;
-}
-
-function buildShadowcrawl(pos){
-  var r=new BABYLON.TransformNode('shadowcrawl',scene);r.position=pos.clone();
-  var body=BABYLON.MeshBuilder.CreateSphere('scb',{diameter:1.2,segments:8},scene);body.material=mat('#330055','#7700cc');body.parent=r;body.position.y=0.9;
-  var head=BABYLON.MeshBuilder.CreateSphere('sch',{diameter:0.78,segments:8},scene);head.material=mat('#220044','#5500aa');head.parent=r;head.position.y=1.8;
-  for(var i=0;i<8;i++){var side=i<4?-1:1,idx=i%4;var leg=BABYLON.MeshBuilder.CreateCylinder('scl'+i,{height:1.0,diameter:0.09},scene);leg.material=mat('#440088','#9900ff');leg.parent=r;leg.position.set(side*0.5,0.7+idx*0.1,0);leg.rotation.z=side*(Math.PI/3+idx*0.18);}
-  for(var i=0;i<6;i++){var e=BABYLON.MeshBuilder.CreateSphere('sce'+i,{diameter:0.13},scene);e.material=mat('#ff0000','#ff4400');e.parent=r;var a=(-2+i)*0.22;e.position.set(a,1.82+(i%2)*0.1,0.37-Math.abs(a)*0.1);}
-  [-0.16,0.16].forEach(function(x,i){var m=BABYLON.MeshBuilder.CreateCylinder('scm'+i,{height:0.32,diameterTop:0,diameterBottom:0.08},scene);m.material=mat('#660099','#aa00ff');m.parent=r;m.position.set(x,1.5,0.38);m.rotation.x=Math.PI/4;m.rotation.z=x*2;});
-  return r;
-}
-
-function buildAquafin(pos){
-  var r=new BABYLON.TransformNode('aquafin',scene);r.position=pos.clone();
-  var body=BABYLON.MeshBuilder.CreateSphere('ab',{diameterX:0.85,diameterY:0.7,diameterZ:2.0,segments:8},scene);body.material=mat('#0055aa','#0088ff');body.parent=r;body.position.y=0.7;
-  var head=BABYLON.MeshBuilder.CreateSphere('ah',{diameterX:0.9,diameterY:0.75,diameterZ:0.95,segments:8},scene);head.material=mat('#0066cc','#00aaff');head.parent=r;head.position.set(0,0.75,1.15);
-  for(var i=0;i<3;i++){var fin=BABYLON.MeshBuilder.CreateBox('af'+i,{width:0.7-i*0.15,height:0.06,depth:0.35},scene);fin.material=mat('#003388','#0055cc');fin.parent=r;fin.position.set(0,0.7+i*0.18-0.18,-1.15);fin.rotation.z=(-1+i)*0.6;}
-  var dors=BABYLON.MeshBuilder.CreateBox('adf',{width:0.08,height:0.55,depth:0.7},scene);dors.material=mat('#004499','#0077cc');dors.parent=r;dors.position.set(0,1.2,0.1);
-  [-0.52,0.52].forEach(function(x,i){var sf=BABYLON.MeshBuilder.CreateBox('asf'+i,{width:0.55,height:0.07,depth:0.38},scene);sf.material=mat('#0044aa','#0066cc');sf.parent=r;sf.position.set(x,0.7,0.4);sf.rotation.z=x*0.5;});
-  [-0.3,0.3].forEach(function(x,i){var e=BABYLON.MeshBuilder.CreateSphere('ae'+i,{diameter:0.19},scene);e.material=mat('#00ffff','#88ffff');e.parent=r;e.position.set(x,0.85,1.55);});
-  return r;
-}
-
-function buildStoneback(pos){
-  var r=new BABYLON.TransformNode('stoneback',scene);r.position=pos.clone();
-  var shell=BABYLON.MeshBuilder.CreateSphere('shb',{diameterX:1.6,diameterY:1.0,diameterZ:1.6,segments:6},scene);shell.material=mat('#5a3e2b','#7a5a3b');shell.parent=r;shell.position.y=0.7;
-  for(var i=0;i<6;i++){var a=i/6*Math.PI*2;var plate=BABYLON.MeshBuilder.CreateBox('shp'+i,{width:0.45,height:0.18,depth:0.45},scene);plate.material=mat('#6b4c35','#8b6c50');plate.parent=r;plate.position.set(Math.cos(a)*0.55,1.05,Math.sin(a)*0.55);plate.rotation.y=a;}
-  var head=BABYLON.MeshBuilder.CreateBox('shh',{width:0.7,height:0.6,depth:0.7},scene);head.material=mat('#5c4030','#7a5a40');head.parent=r;head.position.set(0,0.48,0.95);
-  [[-0.58,-0.55],[0.58,-0.55],[-0.58,0.55],[0.58,0.55]].forEach(function(xz,i){var l=BABYLON.MeshBuilder.CreateBox('shl'+i,{width:0.32,height:0.45,depth:0.32},scene);l.material=mat('#4a3020','#6a5040');l.parent=r;l.position.set(xz[0],0.12,xz[1]);});
-  for(var i=0;i<5;i++){var sp=BABYLON.MeshBuilder.CreateCylinder('shsp'+i,{height:0.4,diameterTop:0,diameterBottom:0.16},scene);sp.material=mat('#999999','#bbbbbb');sp.parent=r;sp.position.set(0,1.25,-0.25+i*0.15);}
-  [-0.18,0.18].forEach(function(x,i){var e=BABYLON.MeshBuilder.CreateSphere('she'+i,{diameter:0.15},scene);e.material=mat('#ffaa00','#ffdd00');e.parent=r;e.position.set(x,0.58,1.28);});
-  return r;
-}
-
-function buildNeonfly(pos){
-  var r=new BABYLON.TransformNode('neonfly',scene);r.position=pos.clone();
-  var body=BABYLON.MeshBuilder.CreateSphere('nb',{diameterX:0.52,diameterY:1.0,diameterZ:0.52,segments:8},scene);body.material=mat('#cc00ff','#ff00ff');body.parent=r;body.position.y=1.3;
-  var head=BABYLON.MeshBuilder.CreateSphere('nh',{diameter:0.58,segments:8},scene);head.material=mat('#dd00ee','#ff44ff');head.parent=r;head.position.y=2.1;
-  [-0.16,0.16].forEach(function(x,i){var ant=BABYLON.MeshBuilder.CreateCylinder('na'+i,{height:0.55,diameter:0.045},scene);ant.material=mat('#ff00ff','#ff88ff');ant.parent=r;ant.position.set(x,2.6,0);ant.rotation.z=x*1.6;var tip=BABYLON.MeshBuilder.CreateSphere('nat'+i,{diameter:0.12},scene);tip.material=mat('#ffffff','#ff88ff');tip.parent=r;tip.position.set(x*1.4,2.95,0);});
-  // Wings
-  [[-1.15,1.4,0,0.45],[-0.85,0.85,0.22,0.55],[1.15,1.4,0,-0.45],[0.85,0.85,0.22,-0.55]].forEach(function(d,i){var wing=BABYLON.MeshBuilder.CreateBox('nw'+i,{width:1.0,height:0.06,depth:0.65},scene);var wm=new BABYLON.StandardMaterial('nwm'+i,scene);wm.diffuseColor=h2c(i<2?'#ff00ff':'#00ffff');wm.emissiveColor=h2c(i<2?'#cc00ff':'#00ccff');wm.alpha=0.65;wing.material=wm;wing.parent=r;wing.position.set(d[0],d[1],d[2]);wing.rotation.z=d[3];});
-  [-0.15,0.15].forEach(function(x,i){var e=BABYLON.MeshBuilder.CreateSphere('ne'+i,{diameter:0.17},scene);e.material=mat('#00ffff','#ffffff');e.parent=r;e.position.set(x,2.15,0.27);});
-  var glow=BABYLON.MeshBuilder.CreateSphere('ng',{diameter:0.32},scene);glow.material=mat('#ffffff','#ffaaff');glow.material.alpha=0.75;glow.parent=r;glow.position.y=1.3;
-  return r;
-}
-
-var BUILDERS=[buildFlamor,buildGlaceon,buildVortexor,buildThunderpaw,buildShadowcrawl,buildAquafin,buildStoneback,buildNeonfly];
-
-var SPAWN_POS=[
-  [12,0,8],[-14,0,10],[6,0,-16],[-9,0,-13],
-  [22,0,-6],[-20,0,4],[4,0,22],[-6,0,-24]
-];
-
+// ============================================================
+// SPAWN MONSTERS
+// ============================================================
+var SPAWN_POS=[[12,0,8],[-14,0,10],[6,0,-16],[-9,0,-13],[22,0,-6],[-20,0,4],[4,0,22],[-6,0,-24]];
 function spawnMonsters(){
-  MONSTERS.forEach(function(def,i){
-    var p=SPAWN_POS[i];
-    var pos=new BABYLON.Vector3(p[0],0,p[2]);
-    var root=BUILDERS[i](pos);
+  CATCHABLE.forEach(function(def,i){
+    var p=SPAWN_POS[i];var pos=new BABYLON.Vector3(p[0],0,p[2]);
+    var root=buildMonster(def,pos);
     root.position.y=0;
     monsterEntities.push({def:def,root:root,caught:false,bobTime:Math.random()*Math.PI*2});
   });
 }
 
+// ============================================================
+// SPAWN TRAINERS
+// ============================================================
+function spawnTrainers(){
+  TRAINERS.forEach(function(tr){
+    var pos=new BABYLON.Vector3(tr.pos[0],0,tr.pos[2]);
+    var root=new BABYLON.TransformNode('tr_'+tr.id,scene);root.position=pos.clone();
+    // Trainer body
+    var tbody=BABYLON.MeshBuilder.CreateSphere('trb_'+tr.id,{diameter:0.7,segments:5},scene);tbody.material=mat(tr.color,tr.color);tbody.parent=root;tbody.position.y=0.35;
+    var thead=BABYLON.MeshBuilder.CreateSphere('trh_'+tr.id,{diameter:0.55,segments:5},scene);thead.material=mat('#f0d090','#d0b070');thead.parent=root;thead.position.y=1.0;
+    // ! marker
+    var excl=BABYLON.MeshBuilder.CreateCylinder('trex_'+tr.id,{height:0.5,diameter:0.15,tessellation:6},scene);excl.material=mat('#ffff00','#ffff00');excl.parent=root;excl.position.y=1.9;
+    var excldot=BABYLON.MeshBuilder.CreateSphere('trexd_'+tr.id,{diameter:0.18},scene);excldot.material=mat('#ffff00','#ffff00');excldot.parent=root;excldot.position.y=2.55;
+    if(tr.locked){root.setEnabled(false);}
+    tr.entity={root:root,excl:excl,excldot:excldot};
+  });
+}
+
+// ============================================================
+// INPUT
+// ============================================================
 function setupInput(canvas){
   window.addEventListener('keydown',function(e){
     keys[e.code]=true;
     if(e.code==='Tab'){e.preventDefault();openCollection();}
-    if(e.code==='KeyC'&&nearbyMonster&&!catchAnimating){throwOrb();}
+    if(e.code==='KeyC'&&nearbyMonster&&!catchAnimating&&!inBattle){throwOrb();}
+    if(e.code==='KeyB'&&nearbyTrainer&&!inBattle){startTrainerBattle(nearbyTrainer);}
   });
   window.addEventListener('keyup',function(e){keys[e.code]=false;});
   canvas.addEventListener('mousemove',function(e){if(document.pointerLockElement===canvas){player.rotation.y+=e.movementX*0.002;}});
   canvas.addEventListener('click',function(){canvas.requestPointerLock();});
 }
 
+// ============================================================
+// UPDATE
+// ============================================================
+function update(dt){
+  time+=dt;
+  var speed=5.5;
+  var fwd=new BABYLON.Vector3(Math.sin(player.rotation.y),0,Math.cos(player.rotation.y));
+  var right=new BABYLON.Vector3(Math.cos(player.rotation.y),0,-Math.sin(player.rotation.y));
+  var move=new BABYLON.Vector3(0,0,0);
+  if(keys['KeyW']||keys['ArrowUp'])move.addInPlace(fwd.scale(speed*dt));
+  if(keys['KeyS']||keys['ArrowDown'])move.addInPlace(fwd.scale(-speed*dt));
+  if(keys['KeyA']||keys['ArrowLeft'])move.addInPlace(right.scale(-speed*dt));
+  if(keys['KeyD']||keys['ArrowRight'])move.addInPlace(right.scale(speed*dt));
+  player.position.addInPlace(move);
+  player.position.x=clamp(player.position.x,-50,50);
+  player.position.z=clamp(player.position.z,-50,50);
+  player.position.y=0;
+
+  var camOff=new BABYLON.Vector3(-Math.sin(player.rotation.y)*7,4.5,-Math.cos(player.rotation.y)*7);
+  camera.position=BABYLON.Vector3.Lerp(camera.position,player.position.add(camOff),0.1);
+  camera.setTarget(player.position.add(new BABYLON.Vector3(0,1,0)));
+
+  // Animate monsters
+  nearbyMonster=null;var closestM=4.5;
+  monsterEntities.forEach(function(m){
+    if(m.caught)return;
+    m.bobTime+=dt;
+    m.root.position.y=Math.sin(m.bobTime*1.5)*0.22;
+    m.root.rotation.y+=dt*0.75;
+    var dist=BABYLON.Vector3.Distance(player.position,m.root.position);
+    if(dist<closestM){closestM=dist;nearbyMonster=m;}
+  });
+
+  // Animate trainers
+  nearbyTrainer=null;var closestT=4.0;
+  TRAINERS.forEach(function(tr){
+    if(!tr.entity||tr.beaten)return;
+    tr.entity.excldot.position.y=2.55+Math.sin(time*3)*0.08;
+    var dist=BABYLON.Vector3.Distance(player.position,new BABYLON.Vector3(tr.pos[0],0,tr.pos[2]));
+    if(dist<closestT){closestT=dist;nearbyTrainer=tr;}
+  });
+
+  // Rotate portal ring
+  var ring=scene.getMeshByName('ring');if(ring)ring.rotation.z=time*0.5;
+
+  // HUD
+  if(nearbyMonster&&!catchAnimating){
+    document.getElementById('nearbyname').style.display='block';
+    document.getElementById('nearbyname').innerHTML=nearbyMonster.def.emoji+' <b>'+nearbyMonster.def.name+'</b> — Press C to CATCH!';
+    document.getElementById('catchbtn').style.display='block';
+  } else if(nearbyTrainer&&!catchAnimating){
+    document.getElementById('nearbyname').style.display='block';
+    document.getElementById('nearbyname').innerHTML=nearbyTrainer.emoji+' <b>'+nearbyTrainer.name+'</b> — Press B to BATTLE!';
+    document.getElementById('catchbtn').style.display='none';
+  } else {
+    document.getElementById('nearbyname').style.display='none';
+    document.getElementById('catchbtn').style.display='none';
+  }
+}
+
+// ============================================================
+// CATCH SYSTEM
+// ============================================================
 function throwOrb(){
   if(!nearbyMonster||catchAnimating)return;
   catchAnimating=true;
@@ -357,15 +524,37 @@ function throwOrb(){
 function catchSuccess(target){
   var shakes=0;
   var iv=setInterval(function(){
-    shakes++;
-    target.root.rotation.z=Math.sin(shakes*1.5)*0.3;
+    shakes++;target.root.rotation.z=Math.sin(shakes*1.5)*0.3;
     if(shakes>14){clearInterval(iv);
       var s=1;var sv=setInterval(function(){
         s-=0.07;target.root.scaling=new BABYLON.Vector3(s,s,s);
         if(s<=0.05){clearInterval(sv);target.root.setEnabled(false);target.caught=true;
-          caught[target.def.id]=true;updateCounter();showCaughtMsg(target.def);catchAnimating=false;nearbyMonster=null;}
+          caught[target.def.id]=true;
+          // Add to team if space
+          if(playerTeam.length<3){playerTeam.push({def:target.def,hp:target.def.hp,maxHp:target.def.hp,wins:0});}
+          updateCounter();showCaughtMsg(target.def);catchAnimating=false;nearbyMonster=null;
+          checkEvolutions();}
       },30);}
   },80);
+}
+
+function checkEvolutions(){
+  var allCaught=CATCHABLE.every(function(def){return caught[def.id];});
+  if(allCaught){
+    // Spawn evolutions around portal
+    var alreadySpawned=monsterEntities.some(function(m){return m.def.evolvedFrom;});
+    if(!alreadySpawned){
+      EVOLUTIONS.forEach(function(def,i){
+        var ang=i/8*Math.PI*2;var r=12;
+        var pos=new BABYLON.Vector3(Math.cos(ang)*r,0,Math.sin(ang)*r);
+        var root=buildMonster(def,pos);root.position.y=0;
+        monsterEntities.push({def:def,root:root,caught:false,bobTime:Math.random()*Math.PI*2});
+      });
+      var el=document.getElementById('evo-msg');
+      el.innerHTML='🌟 EVOLUTIONS UNLOCKED!<br><span style="font-size:20px;color:#a78bfa">Evolved monsters appeared near the portal!</span>';
+      el.style.display='block';setTimeout(function(){el.style.display='none';},4000);
+    }
+  }
 }
 
 function showCaughtMsg(def){
@@ -375,67 +564,317 @@ function showCaughtMsg(def){
 }
 
 function updateCounter(){
-  var n=Object.keys(caught).length;
-  document.getElementById('counter').textContent='📦 '+n+' / 8 Caught';
-  if(n===8){setTimeout(function(){alert('🏆 YOU CAUGHT THEM ALL! You are the MonsterCollect Master!');},500);}
+  var nc=Object.keys(caught).length;
+  var nb=TRAINERS.filter(function(t){return t.beaten;}).length;
+  document.getElementById('counter').textContent='📦 '+nc+'/16 | 🏆 '+nb+'/5';
+  if(nc===16&&nb===5){setTimeout(function(){showCaughtMsg({emoji:'🌟',name:'YOU ARE THE MONSTER MASTER!',color:'#fde68a'});},500);}
 }
 
-function update(dt){
-  time+=dt;
-  var speed=5.5;
-  var fwd=new BABYLON.Vector3(Math.sin(player.rotation.y),0,Math.cos(player.rotation.y));
-  var right=new BABYLON.Vector3(Math.cos(player.rotation.y),0,-Math.sin(player.rotation.y));
-  var move=new BABYLON.Vector3(0,0,0);
-  if(keys['KeyW']||keys['ArrowUp'])move.addInPlace(fwd.scale(speed*dt));
-  if(keys['KeyS']||keys['ArrowDown'])move.addInPlace(fwd.scale(-speed*dt));
-  if(keys['KeyA']||keys['ArrowLeft'])move.addInPlace(right.scale(-speed*dt));
-  if(keys['KeyD']||keys['ArrowRight'])move.addInPlace(right.scale(speed*dt));
-  player.position.addInPlace(move);
-  player.position.x=Math.max(-45,Math.min(45,player.position.x));
-  player.position.z=Math.max(-45,Math.min(45,player.position.z));
-  player.position.y=0;
+// ============================================================
+// BATTLE SYSTEM
+// ============================================================
+function getActiveTeamMon(){
+  return playerTeam[battleData.playerMonIdx]||null;
+}
 
-  var camOff=new BABYLON.Vector3(-Math.sin(player.rotation.y)*7,4.5,-Math.cos(player.rotation.y)*7);
-  camera.position=BABYLON.Vector3.Lerp(camera.position,player.position.add(camOff),0.1);
-  camera.setTarget(player.position.add(new BABYLON.Vector3(0,1,0)));
-
-  nearbyMonster=null;var closest=4.5;
-  monsterEntities.forEach(function(m){
-    if(m.caught)return;
-    m.bobTime+=dt;
-    m.root.position.y=Math.sin(m.bobTime*1.5)*0.25;
-    m.root.rotation.y+=dt*0.7;
-    var dist=BABYLON.Vector3.Distance(player.position,m.root.position);
-    if(dist<closest){closest=dist;nearbyMonster=m;}
-  });
-
-  var ring=scene.getMeshByName('ring');if(ring)ring.rotation.z=time*0.5;
-
-  if(nearbyMonster&&!catchAnimating){
-    document.getElementById('nearbyname').style.display='block';
-    document.getElementById('nearbyname').textContent=nearbyMonster.def.emoji+' '+nearbyMonster.def.name+' — Press C to CATCH!';
-    document.getElementById('catchbtn').style.display='block';
-  }else if(!catchAnimating){
-    document.getElementById('nearbyname').style.display='none';
-    document.getElementById('catchbtn').style.display='none';
+function startWildBattle(monsterEntity){
+  if(playerTeam.length===0){
+    alert('You need monsters on your team first! Catch some then add them to your team.');return;
   }
+  inBattle=true;
+  battleData={
+    enemy:{def:monsterEntity.def,hp:monsterEntity.def.hp,maxHp:monsterEntity.def.hp},
+    isTrainer:false,monsterEntity:monsterEntity,playerMonIdx:0
+  };
+  openBattleScreen('Wild '+monsterEntity.def.name+' appeared!');
 }
 
-function openCollection(){
+function startTrainerBattle(trainer){
+  if(playerTeam.length===0){alert('You need monsters on your team first!');return;}
+  // Reset trainer team HP
+  trainer.team.forEach(function(m){m.hp=m.maxHp;});
+  inBattle=true;
+  battleData={
+    enemy:trainer.team[0],
+    isTrainer:true,trainerRef:trainer,trainerTeamIdx:0,playerMonIdx:0
+  };
+  openBattleScreen(trainer.name+' wants to battle!');
+}
+
+function openBattleScreen(msg){
+  document.getElementById('battle-screen').style.display='flex';
+  document.getElementById('battle-header').textContent='⚔️ '+msg;
+  updateBattleUI();
+  setLog(msg);
+  setBattleButtons(false);
+}
+
+function updateBattleUI(){
+  var pm=playerTeam[battleData.playerMonIdx];
+  var em=battleData.enemy;
+  // Player side
+  document.getElementById('player-sprite').textContent=pm.def.emoji;
+  document.getElementById('player-battle-name').textContent=pm.def.name;
+  document.getElementById('player-battle-type').textContent=pm.def.type;
+  document.getElementById('player-hp-text').textContent=Math.max(0,Math.round(pm.hp))+' / '+pm.maxHp;
+  var ppct=Math.max(0,pm.hp/pm.maxHp*100);
+  var pf=document.getElementById('player-hp-fill');
+  pf.style.width=ppct+'%';
+  pf.className='hp-bar-fill'+(ppct<25?' low':ppct<50?' mid':'');
+  // Enemy side
+  document.getElementById('enemy-sprite').textContent=em.def.emoji;
+  document.getElementById('enemy-battle-name').textContent=em.def.name;
+  document.getElementById('enemy-battle-type').textContent=em.def.type;
+  document.getElementById('enemy-hp-text').textContent=Math.max(0,Math.round(em.hp))+' / '+em.maxHp;
+  var epct=Math.max(0,em.hp/em.maxHp*100);
+  var ef=document.getElementById('enemy-hp-fill');
+  ef.style.width=epct+'%';
+  ef.className='hp-bar-fill'+(epct<25?' low':epct<50?' mid':'');
+  // Move buttons
+  pm.def.moves.forEach(function(mv,i){
+    var btn=document.getElementById('move'+i);
+    btn.textContent=mv.e+' '+mv.n+' ('+mv.d+')';
+  });
+}
+
+function setLog(txt){document.getElementById('battle-log').textContent=txt;}
+function appendLog(txt){var el=document.getElementById('battle-log');el.textContent+='\n'+txt;}
+
+function setBattleButtons(disabled){
+  ['move0','move1','move2','btn-switch','btn-run'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.disabled=disabled;
+  });
+}
+
+function useMove(idx){
+  var pm=playerTeam[battleData.playerMonIdx];
+  var em=battleData.enemy;
+  var move=pm.def.moves[idx];
+  var dmg=move.d+Math.floor(Math.random()*8)-3;
+  em.hp-=dmg;
+  setBattleButtons(true);
+  setLog('You used '+move.n+'! '+move.e);
+  shakeSprite('enemy-sprite');
+  setTimeout(function(){
+    appendLog(em.def.name+' took '+dmg+' damage!');
+    updateBattleUI();
+    if(em.hp<=0){
+      handleEnemyFainted();return;
+    }
+    // Enemy attacks back
+    setTimeout(function(){
+      var emove=em.def.moves[Math.floor(Math.random()*em.def.moves.length)];
+      var edmg=emove.d+Math.floor(Math.random()*6)-2;
+      pm.hp-=edmg;
+      appendLog(em.def.name+' used '+emove.n+'! '+emove.e);
+      shakeSprite('player-sprite');
+      setTimeout(function(){
+        appendLog('Your '+pm.def.name+' took '+edmg+' damage!');
+        updateBattleUI();
+        if(pm.hp<=0){handlePlayerFainted();}
+        else{setBattleButtons(false);}
+      },600);
+    },800);
+  },600);
+}
+
+function shakeSprite(id){
+  var el=document.getElementById(id);
+  el.style.animation='none';
+  setTimeout(function(){el.style.animation='monsterShake 0.4s';},10);
+}
+
+function handleEnemyFainted(){
+  var em=battleData.enemy;
+  appendLog(em.def.name+' fainted! You win!');
+  // Give a win to player monster
+  var pm=playerTeam[battleData.playerMonIdx];
+  pm.wins=(pm.wins||0)+1;
+  setTimeout(function(){
+    if(battleData.isTrainer){
+      var tr=battleData.trainerRef;
+      battleData.trainerTeamIdx++;
+      if(battleData.trainerTeamIdx<tr.team.length){
+        // Next trainer monster
+        battleData.enemy=tr.team[battleData.trainerTeamIdx];
+        setLog(tr.name+' sends out '+battleData.enemy.def.name+'!');
+        updateBattleUI();setBattleButtons(false);
+      } else {
+        // Trainer beaten!
+        tr.beaten=true;trainersBeaten++;
+        if(tr.entity)tr.entity.root.setEnabled(false);
+        updateCounter();
+        setLog('You defeated '+tr.name+'!');
+        // Check if all 4 regular trainers beaten → unlock boss
+        var regularBeaten=TRAINERS.filter(function(t){return t.id!=='boss'&&t.beaten;}).length;
+        if(regularBeaten>=4&&!TRAINERS[4].beaten){
+          setTimeout(function(){
+            TRAINERS[4].locked=false;TRAINERS[4].entity.root.setEnabled(true);
+            appendLog('THE VOID EMPEROR HAS APPEARED AT THE PORTAL!');
+          },1500);
+        }
+        setTimeout(function(){endBattle(true);},2000);
+      }
+    } else {
+      setTimeout(function(){endBattle(true);},1500);
+    }
+  },1000);
+}
+
+function handlePlayerFainted(){
+  var pm=playerTeam[battleData.playerMonIdx];
+  appendLog('Your '+pm.def.name+' fainted!');
+  // Find next alive monster
+  var next=-1;
+  for(var i=0;i<playerTeam.length;i++){if(i!==battleData.playerMonIdx&&playerTeam[i].hp>0){next=i;break;}}
+  setTimeout(function(){
+    if(next>=0){
+      battleData.playerMonIdx=next;
+      appendLog('Go, '+playerTeam[next].def.name+'!');
+      updateBattleUI();setBattleButtons(false);
+    } else {
+      appendLog('All your monsters fainted! You lose...');
+      // Restore HP
+      setTimeout(function(){
+        playerTeam.forEach(function(m){m.hp=m.maxHp;});
+        endBattle(false);
+      },2000);
+    }
+  },1000);
+}
+
+function runFromBattle(){
+  if(battleData.isTrainer){setLog("Can't run from a trainer battle!");return;}
+  setLog('Got away safely!');
+  setTimeout(function(){endBattle(false);},1000);
+}
+
+function endBattle(won){
+  inBattle=false;
+  document.getElementById('battle-screen').style.display='none';
+  setBattleButtons(false);
+  battleData=null;
+}
+
+function openSwitch(){
+  var panel=document.getElementById('switch-panel');
+  var opts=document.getElementById('switch-options');opts.innerHTML='';
+  playerTeam.forEach(function(m,i){
+    if(i===battleData.playerMonIdx)return;
+    var btn=document.createElement('button');btn.className='switch-card'+(m.hp<=0?' fainted':'');
+    btn.innerHTML=m.def.emoji+' '+m.def.name+' ('+Math.max(0,Math.round(m.hp))+'/'+m.maxHp+' HP)';
+    if(m.hp>0){btn.onclick=function(){switchTo(i);};}
+    opts.appendChild(btn);
+  });
+  panel.style.display='flex';
+}
+
+function switchTo(idx){
+  battleData.playerMonIdx=idx;
+  document.getElementById('switch-panel').style.display='none';
+  var pm=playerTeam[idx];
+  setLog('Go, '+pm.def.name+'!');
+  updateBattleUI();setBattleButtons(false);
+}
+
+function closeSwitch(){document.getElementById('switch-panel').style.display='none';}
+
+// ============================================================
+// COLLECTION
+// ============================================================
+function showTab(tab){
+  collectionTab=tab;
+  document.querySelectorAll('.ctab').forEach(function(el){el.classList.remove('active');});
+  event.target.classList.add('active');
+  renderCollection();
+}
+
+function renderCollection(){
   var grid=document.getElementById('collection-grid');grid.innerHTML='';
-  MONSTERS.forEach(function(def){
+  var list=ALL_MONSTERS;
+  if(collectionTab==='caught')list=ALL_MONSTERS.filter(function(d){return caught[d.id];});
+  if(collectionTab==='evolved')list=EVOLUTIONS;
+  list.forEach(function(def){
+    var isCaught=caught[def.id];
     var card=document.createElement('div');
-    card.className='monster-card'+(caught[def.id]?'':' locked');
-    card.innerHTML='<div style="font-size:60px;height:80px;display:flex;align-items:center;justify-content:center;'+(caught[def.id]?'text-shadow:0 0 20px '+def.color:'filter:grayscale(1)')+'">'+( caught[def.id]?def.emoji:'❓')+'</div>'
-      +'<div class="mname">'+(caught[def.id]?def.name:'???')+'</div>'
-      +'<div class="mtype">'+(caught[def.id]?def.type:'Unknown')+'</div>'
-      +'<div class="mdesc">'+(caught[def.id]?def.desc:'')+'</div>';
+    card.className='monster-card'+(def.evolvedFrom?' evolved-card':'')+(isCaught?'':' locked');
+    card.innerHTML='<div class="micon" style="'+(isCaught?'text-shadow:0 0 16px '+def.color:'filter:grayscale(1) brightness(0.3)')+'">'+(isCaught?def.emoji:'❓')+'</div>'
+      +'<div class="mname">'+(isCaught?def.name:'???')+'</div>'
+      +'<div class="mtype">'+(isCaught?def.type:'Unknown')+'</div>'
+      +'<div class="mstats">'+(isCaught?(def.evolvedFrom?'⭐ EVOLVED':'HP: '+def.hp+' | '+def.moves[2].n):'')+'</div>';
     grid.appendChild(card);
   });
-  document.getElementById('collection-screen').style.display='flex';
 }
 
+function openCollection(){renderCollection();document.getElementById('collection-screen').style.display='flex';}
 function closeCollection(){document.getElementById('collection-screen').style.display='none';}
+
+// ============================================================
+// TEAM MANAGEMENT
+// ============================================================
+function openTeam(){
+  renderTeam();document.getElementById('team-screen').style.display='flex';
+}
+
+function renderTeam(){
+  var slots=document.getElementById('team-slots');slots.innerHTML='';
+  for(var i=0;i<3;i++){
+    var slot=document.createElement('div');
+    if(playerTeam[i]){
+      var m=playerTeam[i];
+      slot.className='team-slot';
+      slot.innerHTML='<div style="font-size:44px">'+m.def.emoji+'</div><div class="mname">'+m.def.name+'</div><div class="mtype">'+m.def.type+'</div><div class="mstats">HP: '+Math.round(m.hp)+'/'+m.maxHp+'</div>';
+      var rmBtn=document.createElement('button');rmBtn.className='remove-btn';rmBtn.textContent='Remove';
+      (function(idx){rmBtn.onclick=function(){playerTeam.splice(idx,1);renderTeam();};})(i);
+      slot.appendChild(rmBtn);
+    } else {
+      slot.className='team-slot empty';slot.innerHTML='<div style="font-size:36px;color:#4b5563">+</div><div style="color:#6b7280;font-size:12px">Empty slot</div>';
+    }
+    slots.appendChild(slot);
+  }
+  // Bench
+  var bench=document.getElementById('bench-grid');bench.innerHTML='';
+  Object.keys(caught).forEach(function(id){
+    var def=ALL_MONSTERS.find(function(d){return d.id===id;});
+    if(!def)return;
+    var inTeam=playerTeam.some(function(m){return m.def.id===id;});
+    var card=document.createElement('div');card.className='bench-card'+(inTeam?' in-team':'');
+    card.innerHTML='<div style="font-size:36px">'+def.emoji+'</div><div class="mname" style="font-size:12px">'+def.name+'</div>';
+    if(!inTeam){card.onclick=function(){if(playerTeam.length<3){playerTeam.push({def:def,hp:def.hp,maxHp:def.hp,wins:0});renderTeam();}else{alert('Team is full! Remove a monster first.');}};}
+    bench.appendChild(card);
+  });
+}
+
+function closeTeam(){document.getElementById('team-screen').style.display='none';}
+
+// ============================================================
+// STORY
+// ============================================================
+function openStory(){
+  var list=document.getElementById('trainer-list');list.innerHTML='';
+  TRAINERS.forEach(function(tr){
+    var row=document.createElement('div');row.className='trainer-row'+(tr.beaten?' beaten':'');
+    var locked=tr.locked&&!tr.beaten;
+    row.innerHTML='<div class="trainer-icon">'+(locked?'🔒':tr.emoji)+'</div>'
+      +'<div class="trainer-info"><div class="tname">'+(locked?'???':tr.name)+'</div>'
+      +'<div class="tdesc">'+(locked?'Defeat all 4 trainers to unlock':tr.desc)+'</div></div>'
+      +'<div class="trainer-status">'+(tr.beaten?'✅':'❌')+'</div>';
+    list.appendChild(row);
+  });
+  document.getElementById('story-screen').style.display='flex';
+}
+
+function closeStory(){document.getElementById('story-screen').style.display='none';}
+
+// ============================================================
+// CATCHBTN tap handler for trainers too
+// ============================================================
+document.getElementById('catchbtn').addEventListener('click',function(){
+  if(nearbyMonster&&!catchAnimating&&!inBattle){throwOrb();}
+});
+document.addEventListener('keydown',function(e){
+  if(e.code==='Tab'&&!inBattle){e.preventDefault();openCollection();}
+});
 </script>
 </body>
 </html>
