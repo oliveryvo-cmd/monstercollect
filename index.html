@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MonsterCollect</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:#000; overflow:hidden; font-family:'Arial Black',sans-serif; }
+#c { width:100vw; height:100vh; display:block; }
+#topbar {
+  position:fixed; top:16px; left:50%; transform:translateX(-50%);
+  background:linear-gradient(135deg,rgba(0,0,0,0.85),rgba(20,0,60,0.85));
+  border:2px solid #a855f7; border-radius:20px; padding:8px 24px;
+  color:#fff; font-size:18px; letter-spacing:2px; box-shadow:0 0 20px #a855f7;
+  pointer-events:none; z-index:10;
+}
+#catchbtn {
+  position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
+  background:linear-gradient(135deg,#7c3aed,#db2777);
+  border:3px solid #f0abfc; border-radius:50px; padding:14px 40px;
+  color:#fff; font-size:20px; font-weight:900; cursor:pointer;
+  box-shadow:0 0 30px #a855f7; letter-spacing:3px; display:none;
+  pointer-events:all; z-index:10;
+}
+#nearbyname {
+  position:fixed; bottom:100px; left:50%; transform:translateX(-50%);
+  color:#fde68a; font-size:22px; font-weight:900; text-shadow:0 0 12px #f59e0b;
+  display:none; letter-spacing:2px; text-align:center; z-index:10; pointer-events:none;
+}
+#caught-msg {
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  font-size:48px; font-weight:900; color:#fde68a;
+  text-shadow:0 0 30px #f59e0b, 0 0 60px #f59e0b;
+  display:none; text-align:center; pointer-events:none; z-index:20;
+}
+#collection-btn {
+  position:fixed; top:16px; right:16px;
+  background:linear-gradient(135deg,#1d4ed8,#7c3aed);
+  border:2px solid #93c5fd; border-radius:14px; padding:10px 18px;
+  color:#fff; font-size:16px; font-weight:900; cursor:pointer;
+  box-shadow:0 0 16px #3b82f6; z-index:10; letter-spacing:1px;
+}
+#counter {
+  position:fixed; top:16px; left:16px;
+  background:rgba(0,0,0,0.75); border:2px solid #a855f7;
+  border-radius:14px; padding:10px 18px; color:#fff; font-size:16px;
+  font-weight:900; box-shadow:0 0 12px #a855f7; z-index:10; pointer-events:none;
+}
+#collection-screen {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0.95); z-index:100; display:none;
+  flex-direction:column; align-items:center; padding:20px; overflow-y:auto;
+}
+#collection-screen h1 { color:#fde68a; font-size:40px; margin-bottom:20px; text-shadow:0 0 20px #f59e0b; letter-spacing:4px; }
+#collection-grid { display:grid; grid-template-columns:repeat(auto-fill,180px); gap:16px; width:100%; max-width:900px; }
+.monster-card { background:linear-gradient(135deg,#1e1b4b,#312e81); border:2px solid #7c3aed; border-radius:16px; padding:16px; text-align:center; color:#fff; }
+.monster-card.locked { opacity:0.3; filter:grayscale(1); }
+.mname { font-size:14px; font-weight:900; margin-top:8px; color:#fde68a; letter-spacing:1px; }
+.mtype { font-size:11px; color:#a78bfa; margin-top:2px; }
+.mdesc { font-size:10px; color:#6ee7b7; margin-top:2px; }
+#close-collection { margin-top:20px; background:#7c3aed; border:none; border-radius:12px; padding:12px 32px; color:#fff; font-size:18px; font-weight:900; cursor:pointer; letter-spacing:2px; }
+#controls-hint { position:fixed; bottom:30px; right:16px; background:rgba(0,0,0,0.7); border:1px solid #4b5563; border-radius:10px; padding:10px 14px; color:#9ca3af; font-size:12px; line-height:1.8; z-index:10; pointer-events:none; }
+#title-screen {
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:radial-gradient(ellipse at center, #1e1b4b 0%, #000 100%);
+  z-index:200; display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+#title-screen h1 { font-size:68px; color:#fde68a; text-shadow:0 0 40px #f59e0b; letter-spacing:6px; margin-bottom:8px; animation:pulse 2s infinite; text-align:center; }
+#title-screen p { color:#a78bfa; font-size:20px; margin-bottom:50px; letter-spacing:3px; }
+#start-btn { background:linear-gradient(135deg,#7c3aed,#db2777); border:3px solid #f0abfc; border-radius:50px; padding:18px 60px; color:#fff; font-size:26px; font-weight:900; cursor:pointer; box-shadow:0 0 40px #a855f7; letter-spacing:4px; animation:glow 2s infinite alternate; }
+@keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
+@keyframes glow { from{box-shadow:0 0 20px #a855f7} to{box-shadow:0 0 60px #f0abfc} }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="title-screen">
+  <h1>MONSTER<br>COLLECT</h1>
+  <p>Explore. Find. Catch them all.</p>
+  <button id="start-btn" onclick="startGame()">▶ START GAME</button>
+</div>
+<div id="topbar">⚡ MONSTERCOLLECT</div>
+<div id="counter">📦 0 / 8 Caught</div>
+<button id="collection-btn" onclick="openCollection()">📋 COLLECTION</button>
+<div id="nearbyname"></div>
+<button id="catchbtn" onclick="throwOrb()">🔮 CATCH!</button>
+<div id="caught-msg"></div>
+<div id="controls-hint">WASD — Move<br>Mouse — Look<br>C / Tap — Catch<br>TAB — Collection</div>
+<div id="collection-screen">
+  <h1>🏆 MY COLLECTION</h1>
+  <div id="collection-grid"></div>
+  <button id="close-collection" onclick="closeCollection()">✖ CLOSE</button>
+</div>
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script>
+var MONSTERS=[
+  {id:'flamor',name:'FLAMOR',type:'Fire Lion',emoji:'🔥',color:'#ff4500',ec:'#ff2200',desc:'Blazing mane, volcanic roar'},
+  {id:'glaceon',name:'GLACEON',type:'Ice Wolf',emoji:'❄️',color:'#00cfff',ec:'#0088ff',desc:'Crystal claws, frozen howl'},
+  {id:'vortexor',name:'VORTEXOR',type:'Wind Serpent',emoji:'🌀',color:'#00ff88',ec:'#00cc66',desc:'Spiral body, hurricane breath'},
+  {id:'thunderpaw',name:'THUNDERPAW',type:'Electric Bear',emoji:'⚡',color:'#ffdd00',ec:'#ffaa00',desc:'Static fur, lightning strike'},
+  {id:'shadowcrawl',name:'SHADOWCRAWL',type:'Shadow Spider',emoji:'🕷️',color:'#9900ff',ec:'#6600cc',desc:'Eight dark legs, void web'},
+  {id:'aquafin',name:'AQUAFIN',type:'Water Dragon',emoji:'💧',color:'#00aaff',ec:'#0055ff',desc:'Scales of sea, tidal wave'},
+  {id:'stoneback',name:'STONEBACK',type:'Rock Titan',emoji:'🪨',color:'#c87941',ec:'#884422',desc:'Granite armor, earth quake'},
+  {id:'neonfly',name:'NEONFLY',type:'Neon Moth',emoji:'🦋',color:'#ff00ff',ec:'#cc00ff',desc:'Plasma wings, light speed'}
+];
+var engine,scene,camera,player;
+var monsterEntities=[];
+var caught={};
+var nearbyMonster=null;
+var catchAnimating=false;
+var keys={};
+var time=0;
+var gameStarted=false;
+
+function h2c(h){var r=parseInt(h.slice(1,3),16)/255,g=parseInt(h.slice(3,5),16)/255,b=parseInt(h.slice(5,7),16)/255;return new BABYLON.Color3(r,g,b);}
+function mat(col,ec,al){var m=new BABYLON.StandardMaterial('m'+Math.random(),scene);m.diffuseColor=h2c(col);m.emissiveColor=h2c(ec);if(al!=null)m.alpha=al;return m;}
+
+function startGame(){document.getElementById('title-screen').style.display='none';gameStarted=true;initBabylon();}
+
+function initBabylon(){
+  var canvas=document.getElementById('c');
+  engine=new BABYLON.Engine(canvas,true);
+  scene=new BABYLON.Scene(engine);
+  scene.clearColor=new BABYLON.Color4(0.01,0.01,0.06,1);
+  scene.gravity=new BABYLON.Vector3(0,-9.8,0);
+  scene.collisionsEnabled=true;
+
+  camera=new BABYLON.UniversalCamera('cam',new BABYLON.Vector3(0,4,-8),scene);
+  camera.setTarget(new BABYLON.Vector3(0,1,0));
+  camera.minZ=0.1;
+
+  var amb=new BABYLON.HemisphericLight('amb',new BABYLON.Vector3(0,1,0),scene);
+  amb.intensity=0.55;amb.diffuse=new BABYLON.Color3(0.6,0.5,1);amb.specular=new BABYLON.Color3(0,0,0);
+  var sun=new BABYLON.PointLight('sun',new BABYLON.Vector3(10,30,10),scene);
+  sun.intensity=0.9;sun.diffuse=new BABYLON.Color3(1,0.9,0.8);
+
+  buildWorld();buildPlayer();spawnMonsters();setupInput(canvas);
+
+  engine.runRenderLoop(function(){
+    var dt=engine.getDeltaTime()/1000;
+    if(gameStarted)update(dt);
+    scene.render();
+  });
+  window.addEventListener('resize',function(){engine.resize();});
+}
+
+function buildWorld(){
+  var ground=BABYLON.MeshBuilder.CreateGround('g',{width:100,height:100,subdivisions:4},scene);
+  var gm=mat('#1a5c1a','#081808');ground.material=gm;
+
+  // Sky sphere
+  var sky=BABYLON.MeshBuilder.CreateSphere('sky',{diameter:200,segments:6,sideOrientation:BABYLON.Mesh.BACKSIDE},scene);
+  var sm=new BABYLON.StandardMaterial('sm',scene);sm.emissiveColor=new BABYLON.Color3(0.02,0.01,0.1);sm.backFaceCulling=false;sky.material=sm;
+
+  // Stars
+  for(var i=0;i<800;i++){
+    var s=BABYLON.MeshBuilder.CreateSphere('s'+i,{diameter:0.07+Math.random()*0.1},scene);
+    var stm=new BABYLON.StandardMaterial('stm'+i,scene);
+    stm.emissiveColor=new BABYLON.Color3(0.7+Math.random()*0.3,0.7+Math.random()*0.3,0.7+Math.random()*0.3);
+    s.material=stm;
+    var a=Math.random()*Math.PI*2,b=Math.random()*Math.PI*0.6+0.1,r=88+Math.random()*5;
+    s.position.set(Math.sin(b)*Math.cos(a)*r,Math.cos(b)*r*0.7+10,Math.sin(b)*Math.sin(a)*r);
+  }
+
+  // Floating islands with platforms
+  var iColors=['#2d5a1b','#1a3d5c','#4a1a5a','#5a3a1a'];
+  for(var i=0;i<10;i++){
+    var angle=i/10*Math.PI*2, dist=18+Math.random()*10;
+    var isl=BABYLON.MeshBuilder.CreateCylinder('isl'+i,{height:1.5,diameterTop:4+Math.random()*3,diameterBottom:1.5,tessellation:6},scene);
+    isl.material=mat(iColors[i%4],iColors[i%4]);
+    isl.position.set(Math.cos(angle)*dist,4+Math.random()*4,Math.sin(angle)*dist);
+    var top=BABYLON.MeshBuilder.CreateBox('it'+i,{width:4+Math.random()*3,height:0.2,depth:4+Math.random()*3},scene);
+    top.material=mat('#22661a','#0a3308');
+    top.position=isl.position.clone();top.position.y+=0.85;
+  }
+
+  // Trees
+  for(var i=0;i<40;i++){
+    var tx=(Math.random()-0.5)*90,tz=(Math.random()-0.5)*90;
+    var trk=BABYLON.MeshBuilder.CreateCylinder('trk'+i,{height:2+Math.random(),diameterTop:0.3,diameterBottom:0.5},scene);
+    trk.material=mat('#5a3a0f','#3a2508');trk.position.set(tx,0.8+Math.random()*0.5,tz);
+    var lv=BABYLON.MeshBuilder.CreateSphere('lv'+i,{diameter:2.5+Math.random()*1.5,segments:5},scene);
+    lv.material=mat('#1a6612','#0a3808');lv.position.set(tx,3+Math.random(),tz);
+  }
+
+  // Mystical orbs
+  for(var i=0;i<25;i++){
+    var orb=BABYLON.MeshBuilder.CreateSphere('orb'+i,{diameter:0.3},scene);
+    var orbColors=['#ff00ff','#00ffff','#ffff00','#ff8800','#88ff00'];
+    var om=new BABYLON.StandardMaterial('om'+i,scene);om.emissiveColor=h2c(orbColors[i%5]);
+    orb.material=om;orb.position.set((Math.random()-0.5)*80,0.5+Math.random()*2,(Math.random()-0.5)*80);
+  }
+
+  // Giant portal ring
+  var ring=BABYLON.MeshBuilder.CreateTorus('ring',{diameter:5,thickness:0.3,tessellation:40},scene);
+  var rm=new BABYLON.StandardMaterial('rm',scene);rm.emissiveColor=new BABYLON.Color3(0.9,0.1,1);
+  ring.material=rm;ring.position.y=4;ring.rotation.x=Math.PI/2;
+
+  // Crystal pillars
+  for(var i=0;i<6;i++){
+    var angle=i/6*Math.PI*2;
+    var pil=BABYLON.MeshBuilder.CreateCylinder('pil'+i,{height:6,diameterTop:0.2,diameterBottom:0.5,tessellation:6},scene);
+    pil.material=mat('#220044','#8800ff');
+    pil.position.set(Math.cos(angle)*8,3,Math.sin(angle)*8);
+  }
+}
+
+function buildPlayer(){
+  player=new BABYLON.TransformNode('player',scene);
+  player.position.set(0,0,0);
+  var body=BABYLON.MeshBuilder.CreateSphere('pbody',{diameter:0.65,segments:6},scene);
+  body.material=mat('#1a4aff','#0022cc');body.parent=player;body.position.y=0.33;
+  var head=BABYLON.MeshBuilder.CreateSphere('phead',{diameter:0.52,segments:6},scene);
+  head.material=mat('#f0c090','#c08060');head.parent=player;head.position.y=0.95;
+  var cap=BABYLON.MeshBuilder.CreateCylinder('pcap',{height:0.15,diameterTop:0.7,diameterBottom:0.4,tessellation:8},scene);
+  cap.material=mat('#cc2222','#aa0000');cap.parent=player;cap.position.y=1.25;
+  var brim=BABYLON.MeshBuilder.CreateCylinder('pbrim',{height:0.06,diameter:0.9,tessellation:8},scene);
+  brim.material=mat('#cc2222','#aa0000');brim.parent=player;brim.position.y=1.17;
+  var cape=BABYLON.MeshBuilder.CreateBox('pcape',{width:0.6,height:0.7,depth:0.06},scene);
+  cape.material=mat('#8822aa','#550088');cape.parent=player;cape.position.set(0,0.35,-0.3);
+}
+
+function buildFlamor(pos){
+  var r=new BABYLON.TransformNode('flamor',scene);r.position=pos.clone();
+  var body=BABYLON.MeshBuilder.CreateSphere('fb',{diameter:1.3,segments:8},scene);body.material=mat('#cc2200','#ff4400');body.parent=r;body.position.y=0.65;
+  var head=BABYLON.MeshBuilder.CreateSphere('fh',{diameter:0.9,segments:8},scene);head.material=mat('#dd3300','#ff5500');head.parent=r;head.position.y=1.65;
+  for(var i=0;i<8;i++){var sp=BABYLON.MeshBuilder.CreateCylinder('fsp'+i,{height:0.55,diameterTop:0,diameterBottom:0.2},scene);sp.material=mat('#ff8800','#ffcc00');sp.parent=r;var a=i/8*Math.PI*2;sp.position.set(Math.cos(a)*0.52,1.7,Math.sin(a)*0.52);sp.rotation.z=Math.cos(a)*0.7;sp.rotation.x=Math.sin(a)*0.7;}
+  [[-0.38,-0.3],[0.38,-0.3],[-0.38,0.3],[0.38,0.3]].forEach(function(xz,i){var l=BABYLON.MeshBuilder.CreateCylinder('fl'+i,{height:0.6,diameter:0.24},scene);l.material=mat('#bb2200','#dd3300');l.parent=r;l.position.set(xz[0],0.12,xz[1]);});
+  var tail=BABYLON.MeshBuilder.CreateCylinder('ft',{height:0.9,diameterTop:0.08,diameterBottom:0.3},scene);tail.material=mat('#cc2200','#ff3300');tail.parent=r;tail.position.set(-0.8,0.6,0);tail.rotation.z=Math.PI/3;
+  var flame=BABYLON.MeshBuilder.CreateSphere('ftf',{diameter:0.4},scene);flame.material=mat('#ff6600','#ffaa00');flame.parent=r;flame.position.set(-1.25,1.0,0);
+  [-0.22,0.22].forEach(function(x,i){var e=BABYLON.MeshBuilder.CreateSphere('fe'+i,{diameter:0.2},scene);e.material=mat('#ffff00','#ffffff');e.parent=r;e.position.set(x,1.7,0.42);});
+  return r;
+}
+
+function buildGlaceon(pos){
+  var r=new BABYLON.TransformNode('glaceon',scene);r.position=pos.clone();
+  var body=BABYLON.MeshBuilder.CreateBox('gb',{width:1.1,height:0.85,depth:1.6},scene);body.material=mat('#88ccff','#0088ff');body.parent=r;body.position.y=0.6;
+  var head=BABYLON.MeshBuilder.CreateSphere('gh',{diameter:0.92,segments:8},scene);head.material=mat('#aaddff','#00aaff');head.parent=r;head.position.y=1.5;
+  [-0.28,0.28].forEach(function(x,i){var ear=BABYLON.MeshBuilder.CreateCylinder('ge'+i,{height:0.6,diameterTop:0,diameterBottom:0.24},scene);ear.material=mat('#88ddff','#00ccff');ear.parent=r;ear.position.set(x,2.1,0);ear.rotation.z=x*2;});
+  for(var i=0;i<5;i++){var sp=BABYLON.MeshBuilder.CreateCylinder('gsp'+i,{height:0.55+i*0.1,diameterTop:0,diameterBottom:0.15},scene);sp.material=mat('#ddf8ff','#88ddff');sp.parent=r;sp.position.set(0,1.15+i*0.1,-0.55+i*0.28);}
+  [[-0.4,-0.5],[0.4,-0.5],[-0.4,0.5],[0.4,0.5]].forEach(function(xz,i){var l=BABYLON.MeshBuilder.CreateCylinder('gl'+i,{height:0.55,diameter:0.22},scene);l.material=mat('#66aacc','#0077bb');l.parent=r;l.position.set(xz[0],0.1,xz[1]);});
+  [-0.22,0.22].forEach(function(x,i){var e=BABYLON.MeshBuilder.CreateSphere('gey'+i,{diameter:0.17},scene);e.material=mat('#00ffff','#ffffff');e.parent=r;e.position.set(x,1.56,0.44);});
+  return r;
+}
+
+function buildVortexor(pos){
+  var r=new BABYLON.TransformNode('vortexor',scene);r.position=pos.clone();
+  for(var i=0;i<7;i++){var ring=BABYLON.MeshBuilder.CreateTorus('vr'+i,{diameter:1.3-i*0.08,thickness:0.2,tessellation:16},scene);ring.material=mat('#00bb55','#00ff88');ring.parent=r;ring.position.y=i*0.35;ring.rotation.y=i*0.6;}
+  var head=BABYLON.MeshBuilder.CreateSphere('vh',{diameter:0.8,segments:8},scene);head.material=mat('#00cc66','#00ffaa');head.parent=r;head.position.y=2.7;
+  [-0.22,0.22].forEach(function(x,i){var h=BABYLON.MeshBuilder.CreateCylinder('vh'+i,{height:0.55,diameterTop:0,diameterBottom:0.12},scene);h.material=mat('#00ff88','#aaffcc');h.parent=r;h.position.set(x,3.2,0);h.rotation.z=x*3;});
+  [-0.18,0.18].forEach(function(x,i){var e=BABYLON.MeshBuilder.CreateSphere('ve'+i,{diameter:0.16},scene);e.material=mat('#ffffff','#aaffcc');e.parent=r;e.position.set(x,2.75,0.38);});
+  return r;
+}
+
+function buildThunderpaw(pos){
+  var r=new BABYLON.TransformNode('thunderpaw',scene);r.position=pos.clone();
+  var body=BABYLON.MeshBuilder.CreateSphere('tb',{diameter:1.5,segments:10},scene);body.material=mat('#ddaa00','#ffdd00');body.parent=r;body.position.y=0.75;
+  var head=BABYLON.MeshBuilder.CreateSphere('th',{diameter:1.05,segments:10},scene);head.material=mat('#eebb00','#ffee00');head.parent=r;head.position.y=1.95;
+  [-0.36,0.36].forEach(function(x,i){var ear=BABYLON.MeshBuilder.CreateSphere('te'+i,{diameter:0.33},scene);ear.material=mat('#ffcc00','#ffee88');ear.parent=r;ear.position.set(x,2.6,0);});
+  for(var i=0;i<5;i++){var sp=BABYLON.MeshBuilder.CreateCylinder('tsp'+i,{height:0.38,diameterTop:0,diameterBottom:0.1},scene);sp.material=mat('#ffffff','#ffff88');sp.parent=r;sp.position.set(-0.4+i*0.2,2.6,0);sp.rotation.z=(0.4-i*0.2)*1.5;}
+  var bolt=BABYLON.MeshBuilder.CreateBox('tbolt',{width:0.12,height:0.75,depth:0.06},scene);bolt.material=mat('#ffffff','#ffff00');bolt.parent=r;bolt.position.set(0,0.75,0.76);bolt.rotation.z=0.4;
+  [[-0.52,-0.32],[0.52,-0.32],[-0.52,0.32],[0.52,0.32]].forEach(function(xz,i){var l=BABYLON.MeshBuilder.CreateCylinder('tl'+i,{height:0.65,diameter:0.3},scene);l.material=mat('#cc9900','#eecc00');l.parent=r;l.position.set(xz[0],0.15,xz[1]);});
+  [-0.25,0.25].forEach(function(x,i){var e=BABYLON.MeshBuilder.CreateSphere('tey'+i,{diameter:0.22},scene);e.material=mat('#ff0000','#ff8800');e.parent=r;e.position.set(x,2.0,0.5);});
+  return r;
+}
+
+function buildShadowcrawl(pos){
+  var r=new BABYLON.TransformNode('shadowcrawl',scene);r.position=pos.clone();
+  var body=BABYLON.MeshBuilder.CreateSphere('scb',{diameter:1.2,segments:8},scene);body.material=mat('#330055','#7700cc');body.parent=r;body.position.y=0.9;
+  var head=BABYLON.MeshBuilder.CreateSphere('sch',{diameter:0.78,segments:8},scene);head.material=mat('#220044','#5500aa');head.parent=r;head.position.y=1.8;
+  for(var i=0;i<8;i++){var side=i<4?-1:1,idx=i%4;var leg=BABYLON.MeshBuilder.CreateCylinder('scl'+i,{height:1.0,diameter:0.09},scene);leg.material=mat('#440088','#9900ff');leg.parent=r;leg.position.set(side*0.5,0.7+idx*0.1,0);leg.rotation.z=side*(Math.PI/3+idx*0.18);}
+  for(var i=0;i<6;i++){var e=BABYLON.MeshBuilder.CreateSphere('sce'+i,{diameter:0.13},scene);e.material=mat('#ff0000','#ff4400');e.parent=r;var a=(-2+i)*0.22;e.position.set(a,1.82+(i%2)*0.1,0.37-Math.abs(a)*0.1);}
+  [-0.16,0.16].forEach(function(x,i){var m=BABYLON.MeshBuilder.CreateCylinder('scm'+i,{height:0.32,diameterTop:0,diameterBottom:0.08},scene);m.material=mat('#660099','#aa00ff');m.parent=r;m.position.set(x,1.5,0.38);m.rotation.x=Math.PI/4;m.rotation.z=x*2;});
+  return r;
+}
+
+function buildAquafin(pos){
+  var r=new BABYLON.TransformNode('aquafin',scene);r.position=pos.clone();
+  var body=BABYLON.MeshBuilder.CreateSphere('ab',{diameterX:0.85,diameterY:0.7,diameterZ:2.0,segments:8},scene);body.material=mat('#0055aa','#0088ff');body.parent=r;body.position.y=0.7;
+  var head=BABYLON.MeshBuilder.CreateSphere('ah',{diameterX:0.9,diameterY:0.75,diameterZ:0.95,segments:8},scene);head.material=mat('#0066cc','#00aaff');head.parent=r;head.position.set(0,0.75,1.15);
+  for(var i=0;i<3;i++){var fin=BABYLON.MeshBuilder.CreateBox('af'+i,{width:0.7-i*0.15,height:0.06,depth:0.35},scene);fin.material=mat('#003388','#0055cc');fin.parent=r;fin.position.set(0,0.7+i*0.18-0.18,-1.15);fin.rotation.z=(-1+i)*0.6;}
+  var dors=BABYLON.MeshBuilder.CreateBox('adf',{width:0.08,height:0.55,depth:0.7},scene);dors.material=mat('#004499','#0077cc');dors.parent=r;dors.position.set(0,1.2,0.1);
+  [-0.52,0.52].forEach(function(x,i){var sf=BABYLON.MeshBuilder.CreateBox('asf'+i,{width:0.55,height:0.07,depth:0.38},scene);sf.material=mat('#0044aa','#0066cc');sf.parent=r;sf.position.set(x,0.7,0.4);sf.rotation.z=x*0.5;});
+  [-0.3,0.3].forEach(function(x,i){var e=BABYLON.MeshBuilder.CreateSphere('ae'+i,{diameter:0.19},scene);e.material=mat('#00ffff','#88ffff');e.parent=r;e.position.set(x,0.85,1.55);});
+  return r;
+}
+
+function buildStoneback(pos){
+  var r=new BABYLON.TransformNode('stoneback',scene);r.position=pos.clone();
+  var shell=BABYLON.MeshBuilder.CreateSphere('shb',{diameterX:1.6,diameterY:1.0,diameterZ:1.6,segments:6},scene);shell.material=mat('#5a3e2b','#7a5a3b');shell.parent=r;shell.position.y=0.7;
+  for(var i=0;i<6;i++){var a=i/6*Math.PI*2;var plate=BABYLON.MeshBuilder.CreateBox('shp'+i,{width:0.45,height:0.18,depth:0.45},scene);plate.material=mat('#6b4c35','#8b6c50');plate.parent=r;plate.position.set(Math.cos(a)*0.55,1.05,Math.sin(a)*0.55);plate.rotation.y=a;}
+  var head=BABYLON.MeshBuilder.CreateBox('shh',{width:0.7,height:0.6,depth:0.7},scene);head.material=mat('#5c4030','#7a5a40');head.parent=r;head.position.set(0,0.48,0.95);
+  [[-0.58,-0.55],[0.58,-0.55],[-0.58,0.55],[0.58,0.55]].forEach(function(xz,i){var l=BABYLON.MeshBuilder.CreateBox('shl'+i,{width:0.32,height:0.45,depth:0.32},scene);l.material=mat('#4a3020','#6a5040');l.parent=r;l.position.set(xz[0],0.12,xz[1]);});
+  for(var i=0;i<5;i++){var sp=BABYLON.MeshBuilder.CreateCylinder('shsp'+i,{height:0.4,diameterTop:0,diameterBottom:0.16},scene);sp.material=mat('#999999','#bbbbbb');sp.parent=r;sp.position.set(0,1.25,-0.25+i*0.15);}
+  [-0.18,0.18].forEach(function(x,i){var e=BABYLON.MeshBuilder.CreateSphere('she'+i,{diameter:0.15},scene);e.material=mat('#ffaa00','#ffdd00');e.parent=r;e.position.set(x,0.58,1.28);});
+  return r;
+}
+
+function buildNeonfly(pos){
+  var r=new BABYLON.TransformNode('neonfly',scene);r.position=pos.clone();
+  var body=BABYLON.MeshBuilder.CreateSphere('nb',{diameterX:0.52,diameterY:1.0,diameterZ:0.52,segments:8},scene);body.material=mat('#cc00ff','#ff00ff');body.parent=r;body.position.y=1.3;
+  var head=BABYLON.MeshBuilder.CreateSphere('nh',{diameter:0.58,segments:8},scene);head.material=mat('#dd00ee','#ff44ff');head.parent=r;head.position.y=2.1;
+  [-0.16,0.16].forEach(function(x,i){var ant=BABYLON.MeshBuilder.CreateCylinder('na'+i,{height:0.55,diameter:0.045},scene);ant.material=mat('#ff00ff','#ff88ff');ant.parent=r;ant.position.set(x,2.6,0);ant.rotation.z=x*1.6;var tip=BABYLON.MeshBuilder.CreateSphere('nat'+i,{diameter:0.12},scene);tip.material=mat('#ffffff','#ff88ff');tip.parent=r;tip.position.set(x*1.4,2.95,0);});
+  // Wings
+  [[-1.15,1.4,0,0.45],[-0.85,0.85,0.22,0.55],[1.15,1.4,0,-0.45],[0.85,0.85,0.22,-0.55]].forEach(function(d,i){var wing=BABYLON.MeshBuilder.CreateBox('nw'+i,{width:1.0,height:0.06,depth:0.65},scene);var wm=new BABYLON.StandardMaterial('nwm'+i,scene);wm.diffuseColor=h2c(i<2?'#ff00ff':'#00ffff');wm.emissiveColor=h2c(i<2?'#cc00ff':'#00ccff');wm.alpha=0.65;wing.material=wm;wing.parent=r;wing.position.set(d[0],d[1],d[2]);wing.rotation.z=d[3];});
+  [-0.15,0.15].forEach(function(x,i){var e=BABYLON.MeshBuilder.CreateSphere('ne'+i,{diameter:0.17},scene);e.material=mat('#00ffff','#ffffff');e.parent=r;e.position.set(x,2.15,0.27);});
+  var glow=BABYLON.MeshBuilder.CreateSphere('ng',{diameter:0.32},scene);glow.material=mat('#ffffff','#ffaaff');glow.material.alpha=0.75;glow.parent=r;glow.position.y=1.3;
+  return r;
+}
+
+var BUILDERS=[buildFlamor,buildGlaceon,buildVortexor,buildThunderpaw,buildShadowcrawl,buildAquafin,buildStoneback,buildNeonfly];
+
+var SPAWN_POS=[
+  [12,0,8],[-14,0,10],[6,0,-16],[-9,0,-13],
+  [22,0,-6],[-20,0,4],[4,0,22],[-6,0,-24]
+];
+
+function spawnMonsters(){
+  MONSTERS.forEach(function(def,i){
+    var p=SPAWN_POS[i];
+    var pos=new BABYLON.Vector3(p[0],0,p[2]);
+    var root=BUILDERS[i](pos);
+    root.position.y=0;
+    monsterEntities.push({def:def,root:root,caught:false,bobTime:Math.random()*Math.PI*2});
+  });
+}
+
+function setupInput(canvas){
+  window.addEventListener('keydown',function(e){
+    keys[e.code]=true;
+    if(e.code==='Tab'){e.preventDefault();openCollection();}
+    if(e.code==='KeyC'&&nearbyMonster&&!catchAnimating){throwOrb();}
+  });
+  window.addEventListener('keyup',function(e){keys[e.code]=false;});
+  canvas.addEventListener('mousemove',function(e){if(document.pointerLockElement===canvas){player.rotation.y+=e.movementX*0.002;}});
+  canvas.addEventListener('click',function(){canvas.requestPointerLock();});
+}
+
+function throwOrb(){
+  if(!nearbyMonster||catchAnimating)return;
+  catchAnimating=true;
+  document.getElementById('catchbtn').style.display='none';
+  document.getElementById('nearbyname').style.display='none';
+  var target=nearbyMonster;
+  var orb=BABYLON.MeshBuilder.CreateSphere('corb',{diameter:0.35},scene);
+  var om=new BABYLON.StandardMaterial('corm',scene);om.emissiveColor=new BABYLON.Color3(0.9,0.3,1);orb.material=om;
+  orb.position=player.position.clone();orb.position.y+=1;
+  var tgt=target.root.position.clone();tgt.y+=1.5;
+  var t=0;
+  var iv=setInterval(function(){
+    t+=0.035;
+    if(t>=1){clearInterval(iv);orb.dispose();catchSuccess(target);}
+    else{orb.position=BABYLON.Vector3.Lerp(player.position.clone().add(new BABYLON.Vector3(0,1,0)),tgt,t);orb.position.y+=Math.sin(t*Math.PI)*2;}
+  },16);
+}
+
+function catchSuccess(target){
+  var shakes=0;
+  var iv=setInterval(function(){
+    shakes++;
+    target.root.rotation.z=Math.sin(shakes*1.5)*0.3;
+    if(shakes>14){clearInterval(iv);
+      var s=1;var sv=setInterval(function(){
+        s-=0.07;target.root.scaling=new BABYLON.Vector3(s,s,s);
+        if(s<=0.05){clearInterval(sv);target.root.setEnabled(false);target.caught=true;
+          caught[target.def.id]=true;updateCounter();showCaughtMsg(target.def);catchAnimating=false;nearbyMonster=null;}
+      },30);}
+  },80);
+}
+
+function showCaughtMsg(def){
+  var el=document.getElementById('caught-msg');
+  el.innerHTML='🎉 CAUGHT!<br><span style="color:'+def.color+'">'+def.emoji+' '+def.name+'</span>';
+  el.style.display='block';setTimeout(function(){el.style.display='none';},2800);
+}
+
+function updateCounter(){
+  var n=Object.keys(caught).length;
+  document.getElementById('counter').textContent='📦 '+n+' / 8 Caught';
+  if(n===8){setTimeout(function(){alert('🏆 YOU CAUGHT THEM ALL! You are the MonsterCollect Master!');},500);}
+}
+
+function update(dt){
+  time+=dt;
+  var speed=5.5;
+  var fwd=new BABYLON.Vector3(Math.sin(player.rotation.y),0,Math.cos(player.rotation.y));
+  var right=new BABYLON.Vector3(Math.cos(player.rotation.y),0,-Math.sin(player.rotation.y));
+  var move=new BABYLON.Vector3(0,0,0);
+  if(keys['KeyW']||keys['ArrowUp'])move.addInPlace(fwd.scale(speed*dt));
+  if(keys['KeyS']||keys['ArrowDown'])move.addInPlace(fwd.scale(-speed*dt));
+  if(keys['KeyA']||keys['ArrowLeft'])move.addInPlace(right.scale(-speed*dt));
+  if(keys['KeyD']||keys['ArrowRight'])move.addInPlace(right.scale(speed*dt));
+  player.position.addInPlace(move);
+  player.position.x=Math.max(-45,Math.min(45,player.position.x));
+  player.position.z=Math.max(-45,Math.min(45,player.position.z));
+  player.position.y=0;
+
+  var camOff=new BABYLON.Vector3(-Math.sin(player.rotation.y)*7,4.5,-Math.cos(player.rotation.y)*7);
+  camera.position=BABYLON.Vector3.Lerp(camera.position,player.position.add(camOff),0.1);
+  camera.setTarget(player.position.add(new BABYLON.Vector3(0,1,0)));
+
+  nearbyMonster=null;var closest=4.5;
+  monsterEntities.forEach(function(m){
+    if(m.caught)return;
+    m.bobTime+=dt;
+    m.root.position.y=Math.sin(m.bobTime*1.5)*0.25;
+    m.root.rotation.y+=dt*0.7;
+    var dist=BABYLON.Vector3.Distance(player.position,m.root.position);
+    if(dist<closest){closest=dist;nearbyMonster=m;}
+  });
+
+  var ring=scene.getMeshByName('ring');if(ring)ring.rotation.z=time*0.5;
+
+  if(nearbyMonster&&!catchAnimating){
+    document.getElementById('nearbyname').style.display='block';
+    document.getElementById('nearbyname').textContent=nearbyMonster.def.emoji+' '+nearbyMonster.def.name+' — Press C to CATCH!';
+    document.getElementById('catchbtn').style.display='block';
+  }else if(!catchAnimating){
+    document.getElementById('nearbyname').style.display='none';
+    document.getElementById('catchbtn').style.display='none';
+  }
+}
+
+function openCollection(){
+  var grid=document.getElementById('collection-grid');grid.innerHTML='';
+  MONSTERS.forEach(function(def){
+    var card=document.createElement('div');
+    card.className='monster-card'+(caught[def.id]?'':' locked');
+    card.innerHTML='<div style="font-size:60px;height:80px;display:flex;align-items:center;justify-content:center;'+(caught[def.id]?'text-shadow:0 0 20px '+def.color:'filter:grayscale(1)')+'">'+( caught[def.id]?def.emoji:'❓')+'</div>'
+      +'<div class="mname">'+(caught[def.id]?def.name:'???')+'</div>'
+      +'<div class="mtype">'+(caught[def.id]?def.type:'Unknown')+'</div>'
+      +'<div class="mdesc">'+(caught[def.id]?def.desc:'')+'</div>';
+    grid.appendChild(card);
+  });
+  document.getElementById('collection-screen').style.display='flex';
+}
+
+function closeCollection(){document.getElementById('collection-screen').style.display='none';}
+</script>
+</body>
+</html>
